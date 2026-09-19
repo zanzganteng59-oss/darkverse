@@ -22,29 +22,29 @@ class _BuildApkPageState extends State<BuildApkPage> {
   bool _building = false;
   bool _downloading = false;
   String _status = "IDLE";
-  String _apkUrl = "";
   String _apkSize = "";
   final String _packageName = "com.sync.xxx";
   final String _appName = "PRX Panel";
   final List<String> _logs = [];
   double _progress = 0;
-  Timer? _pollTimer;
 
   File? _apkFile;
   String _customName = "PRX_Panel";
+
+  static const String _githubRepo = "zanzganteng59-oss/darkverse";
+  static const String _releaseTag = "v7.5.0";
+  String get _githubApkUrl => "https://github.com/$_githubRepo/releases/download/$_releaseTag/app-release.apk";
 
   @override
   void initState() {
     super.initState();
     _addLog("[INFO] Build APK Panel", const Color(0xFFFFE74C));
     _addLog("[INFO] Project: $_appName ($_packageName)", const Color(0xFF888888));
-    _addLog("[INFO] Tap BUILD untuk mulai", const Color(0xFF888888));
     _checkExistingApk();
   }
 
   @override
   void dispose() {
-    _pollTimer?.cancel();
     super.dispose();
   }
 
@@ -56,14 +56,10 @@ class _BuildApkPageState extends State<BuildApkPage> {
   Future<bool> _requestStoragePermission() async {
     if (Platform.isAndroid) {
       var status = await Permission.manageExternalStorage.status;
-      if (!status.isGranted) {
-        status = await Permission.manageExternalStorage.request();
-      }
+      if (!status.isGranted) status = await Permission.manageExternalStorage.request();
       if (!status.isGranted) {
         status = await Permission.storage.status;
-        if (!status.isGranted) {
-          status = await Permission.storage.request();
-        }
+        if (!status.isGranted) status = await Permission.storage.request();
       }
       if (!status.isGranted) {
         _addLog("[!] Storage permission denied", const Color(0xFFFF6B6B));
@@ -90,105 +86,87 @@ class _BuildApkPageState extends State<BuildApkPage> {
           _status = "SUCCESS";
         });
         _addLog("[INFO] APK ditemukan: $_apkSize", const Color(0xFF39FF14));
+        _addLog("[INFO] Tap SHARE atau REBUILD", const Color(0xFF888888));
       }
     } catch (_) {}
   }
 
   Future<void> _triggerBuild() async {
-    if (_building) return;
+    if (_building || _downloading) return;
     setState(() {
       _building = true;
-      _status = "SENDING";
+      _status = "DOWNLOADING";
       _logs.clear();
-      _apkUrl = "";
       _apkFile = null;
       _progress = 0;
     });
-    _addLog("[...] Mengirim request build ke server...", const Color(0xFFFFE74C));
+
+    _addLog("[...] Checking GitHub Actions build...", const Color(0xFFFFE74C));
+
     try {
-      final res = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/api/build-apk'),
-        body: jsonEncode({'key': widget.sessionKey, 'username': widget.username}),
-        headers: {'Content-Type': 'application/json'},
+      final checkRes = await http.get(
+        Uri.parse("https://api.github.com/repos/$_githubRepo/actions/runs?per_page=1"),
       ).timeout(const Duration(seconds: 15));
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200 && data['success'] == true) {
-        setState(() { _status = "BUILDING"; });
-        _addLog("[OK] Build request dikirim!", const Color(0xFF39FF14));
-        _addLog("[INFO] ${data['message'] ?? 'Menunggu build...'}", const Color(0xFF00D4FF));
-        if (data['apkUrl'] != null) {
-          _apkUrl = data['apkUrl'] ?? '';
-          _apkSize = data['apkSize'] ?? '';
-          await _downloadApkFile();
-        } else {
-          _pollBuildStatus();
+
+      if (checkRes.statusCode == 200) {
+        final runsData = jsonDecode(checkRes.body);
+        final runs = runsData['workflow_runs'] as List?;
+        if (runs != null && runs.isNotEmpty) {
+          final latestRun = runs[0];
+          final runStatus = latestRun['status'] ?? 'unknown';
+          final runConclusion = latestRun['conclusion'] ?? '';
+          final runName = latestRun['name'] ?? 'Build';
+          final createdAt = latestRun['created_at'] ?? '';
+
+          _addLog("[INFO] Latest run: $runName", const Color(0xFF00D4FF));
+          _addLog("[INFO] Status: $runStatus | Conclusion: $runConclusion", const Color(0xFF00D4FF));
+          _addLog("[INFO] Created: $createdAt", const Color(0xFF888888));
+
+          if (runStatus == 'completed' && runConclusion == 'success') {
+            _addLog("[OK] Build selesai! Downloading APK...", const Color(0xFF39FF14));
+            await _downloadFromGithub();
+            return;
+          } else if (runStatus == 'in_progress' || runStatus == 'queued') {
+            _addLog("[...] Build masih jalan, tunggu...", const Color(0xFFFFE74C));
+            _addLog("[INFO] Buka: https://github.com/$_githubRepo/actions", const Color(0xFF00D4FF));
+            setState(() { _building = false; _status = "WAITING"; });
+            return;
+          }
         }
-      } else {
-        setState(() { _building = false; _status = "FALLBACK"; });
-        _addLog("[!] ${data['error'] ?? 'Server tidak bisa build'}", const Color(0xFFFF6B6B));
-        _showManualInstructions();
       }
+
+      _addLog("[...] No completed build found, downloading anyway...", const Color(0xFFFFE74C));
+      await _downloadFromGithub();
     } catch (e) {
-      setState(() { _building = false; _status = "FALLBACK"; });
-      _addLog("[!] Server offline: $e", const Color(0xFFFF6B6B));
-      _showManualInstructions();
+      _addLog("[!] GitHub API error: $e", const Color(0xFFFF6B6B));
+      _addLog("[...] Trying direct download...", const Color(0xFFFFE74C));
+      await _downloadFromGithub();
     }
   }
 
-  void _showManualInstructions() {
-    _addLog("", const Color(0xFF888888));
-    _addLog("=== BUILD MANUAL (PC) ===", const Color(0xFFFFE74C));
-    _addLog("1. Buka terminal di PC", const Color(0xFFAAAAAA));
-    _addLog("2. cd BASEPISING\\android", const Color(0xFFAAAAAA));
-    _addLog("3. build_apk.bat", const Color(0xFFAAAAAA));
-    _addLog("4. APK di: app\\build\\outputs\\apk\\release\\", const Color(0xFFAAAAAA));
-  }
-
-  void _pollBuildStatus() {
-    _pollTimer?.cancel();
-    _pollTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      if (!mounted) { timer.cancel(); return; }
-      try {
-        final res = await http.get(
-          Uri.parse('${ApiConfig.baseUrl}/api/build-status'),
-        ).timeout(const Duration(seconds: 8));
-        if (res.statusCode == 200) {
-          final data = jsonDecode(res.body);
-          final st = data['status'] ?? 'building';
-          if (mounted) setState(() { _progress = (data['progress'] ?? 0).toDouble(); });
-          if (st == 'done') {
-            timer.cancel();
-            _apkUrl = data['apkUrl'] ?? '';
-            _apkSize = data['apkSize'] ?? '';
-            _addLog("[SUCCESS] Build selesai!", const Color(0xFF39FF14));
-            await _downloadApkFile();
-          } else if (st == 'error') {
-            timer.cancel();
-            setState(() { _building = false; _status = "ERROR"; });
-            _addLog("[ERROR] ${data['error'] ?? 'Build gagal'}", const Color(0xFFFF6B6B));
-          }
-        }
-      } catch (_) {}
-    });
-  }
-
-  Future<void> _downloadApkFile() async {
-    if (_apkUrl.isEmpty) return;
+  Future<void> _downloadFromGithub() async {
     final hasPermission = await _requestStoragePermission();
     if (!hasPermission) {
       setState(() { _building = false; _downloading = false; _status = "ERROR"; });
       return;
     }
+
     try {
       setState(() { _downloading = true; });
-      _addLog("[...] Downloading APK dari server...", const Color(0xFFFFE74C));
-      final fullUrl = '${ApiConfig.baseUrl}$_apkUrl';
-      final res = await http.get(Uri.parse(fullUrl)).timeout(const Duration(seconds: 120));
-      if (res.statusCode == 200) {
+      _addLog("[...] Downloading APK from GitHub...", const Color(0xFFFFE74C));
+      _addLog("[URL] $_githubApkUrl", const Color(0xFF888888));
+
+      final client = http.Client();
+      final request = http.Request('GET', Uri.parse(_githubApkUrl));
+      request.headers['User-Agent'] = 'DarkVerse-App';
+      final streamedResponse = await client.send(request).timeout(const Duration(seconds: 120));
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
         final dir = await getTemporaryDirectory();
         final file = File('${dir.path}/PRX_Panel.apk');
-        await file.writeAsBytes(res.bodyBytes);
-        final sizeMB = (res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1);
+        await file.writeAsBytes(response.bodyBytes);
+        final sizeMB = (response.bodyBytes.length / 1024 / 1024).toStringAsFixed(1);
         setState(() {
           _apkFile = file;
           _apkSize = '${sizeMB}MB';
@@ -196,15 +174,37 @@ class _BuildApkPageState extends State<BuildApkPage> {
           _status = "SUCCESS";
           _downloading = false;
         });
-        _addLog("[DONE] APK siap! Size: ${sizeMB}MB", const Color(0xFF39FF14));
-        _addLog("[INFO] Tap rename untuk ganti nama, tap share untuk kirim", const Color(0xFF00D4FF));
+        _addLog("[DONE] APK downloaded! Size: ${sizeMB}MB", const Color(0xFF39FF14));
+        _addLog("[INFO] Tap RENAME lalu SHARE", const Color(0xFF00D4FF));
+      } else if (response.statusCode == 302 || response.statusCode == 301) {
+        _addLog("[!] Redirect detected, retrying...", const Color(0xFFFFE74C));
+        final redirectUrl = response.headers['location'] ?? '';
+        if (redirectUrl.isNotEmpty) {
+          final res2 = await http.get(Uri.parse(redirectUrl)).timeout(const Duration(seconds: 120));
+          if (res2.statusCode == 200) {
+            final dir = await getTemporaryDirectory();
+            final file = File('${dir.path}/PRX_Panel.apk');
+            await file.writeAsBytes(res2.bodyBytes);
+            final sizeMB = (res2.bodyBytes.length / 1024 / 1024).toStringAsFixed(1);
+            setState(() {
+              _apkFile = file;
+              _apkSize = '${sizeMB}MB';
+              _building = false;
+              _status = "SUCCESS";
+              _downloading = false;
+            });
+            _addLog("[DONE] APK downloaded! Size: ${sizeMB}MB", const Color(0xFF39FF14));
+          }
+        }
       } else {
         setState(() { _building = false; _downloading = false; _status = "ERROR"; });
-        _addLog("[ERROR] Download gagal: ${res.statusCode}", const Color(0xFFFF6B6B));
+        _addLog("[ERROR] Download failed: ${response.statusCode}", const Color(0xFFFF6B6B));
+        _addLog("[INFO] Build APK dari PC: cd BASEPISING/android && build_apk.bat", const Color(0xFF888888));
       }
     } catch (e) {
       setState(() { _building = false; _downloading = false; _status = "ERROR"; });
       _addLog("[ERROR] Download gagal: $e", const Color(0xFFFF6B6B));
+      _addLog("[INFO] Build APK dari PC: cd BASEPISING/android && build_apk.bat", const Color(0xFF888888));
     }
   }
 
@@ -220,13 +220,14 @@ class _BuildApkPageState extends State<BuildApkPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Masukkan nama baru untuk APK:", style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 12, fontFamily: 'Inter')),
+            const Text("Masukkan nama baru:", style: TextStyle(color: Color(0xFFAAAAAA), fontSize: 12, fontFamily: 'Inter')),
             const SizedBox(height: 12),
             TextField(
               controller: ctrl,
+              autofocus: true,
               style: const TextStyle(color: Colors.white, fontFamily: 'ShareTechMono', fontSize: 14),
               decoration: InputDecoration(
-                hintText: "contoh: PRX_UID_abc123",
+                hintText: "PRX_UID_nama",
                 hintStyle: const TextStyle(color: Color(0xFF555555)),
                 filled: true,
                 fillColor: const Color(0xFF0A0A0A),
@@ -235,24 +236,21 @@ class _BuildApkPageState extends State<BuildApkPage> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text("File akan disimpan sebagai: nama.apk", style: TextStyle(color: Color(0xFF666666), fontSize: 10, fontFamily: 'ShareTechMono')),
+            Text("File: ${ctrl.text}.apk", style: const TextStyle(color: Color(0xFF666666), fontSize: 10, fontFamily: 'ShareTechMono')),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("BATAL", style: TextStyle(color: Color(0xFF666666), fontFamily: 'Inter')),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("BATAL", style: TextStyle(color: Color(0xFF666666)))),
           TextButton(
             onPressed: () {
               final newName = ctrl.text.trim();
               if (newName.isNotEmpty) {
                 setState(() { _customName = newName; });
-                _addLog("[OK] Nama diubah ke: ${newName}.apk", const Color(0xFF39FF14));
+                _addLog("[OK] Nama: ${newName}.apk", const Color(0xFF39FF14));
               }
               Navigator.pop(ctx);
             },
-            child: const Text("SIMPAN", style: TextStyle(color: Color(0xFFFFE74C), fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+            child: const Text("SIMPAN", style: TextStyle(color: Color(0xFFFFE74C), fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -265,16 +263,15 @@ class _BuildApkPageState extends State<BuildApkPage> {
     if (!hasPermission) return;
     try {
       if (!await _apkFile!.exists()) {
-        _addLog("[ERROR] File APK tidak ditemukan", const Color(0xFFFF6B6B));
+        _addLog("[ERROR] File APK tidak ada", const Color(0xFFFF6B6B));
         return;
       }
       _addLog("[...] Sharing ${_customName}.apk...", const Color(0xFFFFE74C));
       await Share.shareXFiles(
         [XFile(_apkFile!.path, mimeType: 'application/vnd.android.package-archive', name: '${_customName}.apk')],
         text: '$_appName - $_customName',
-        subject: '${_customName}.apk',
       );
-      _addLog("[OK] Share dialog opened!", const Color(0xFF39FF14));
+      _addLog("[OK] Share opened!", const Color(0xFF39FF14));
     } catch (e) {
       _addLog("[ERROR] Share gagal: $e", const Color(0xFFFF6B6B));
     }
@@ -282,7 +279,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
 
   Color _statusColor() {
     switch (_status) {
-      case "BUILDING": case "SENDING": return const Color(0xFFFFE74C);
+      case "DOWNLOADING": case "WAITING": return const Color(0xFFFFE74C);
       case "SUCCESS": return const Color(0xFF39FF14);
       case "ERROR": return const Color(0xFFFF6B6B);
       default: return const Color(0xFF666666);
@@ -385,7 +382,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            "Rename APK dengan UID sebelum share ke orang lain.",
+                            "APK di-build via GitHub Actions. Tap BUILD untuk download hasil build terbaru.",
                             style: TextStyle(color: Color(0xFFFFE74C), fontSize: 11, fontFamily: 'Inter', height: 1.3),
                           ),
                         ),
@@ -467,7 +464,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
-                    constraints: const BoxConstraints(minHeight: 80, maxHeight: 250),
+                    constraints: const BoxConstraints(minHeight: 80, maxHeight: 300),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(color: const Color(0xFF050505), borderRadius: BorderRadius.circular(8)),
                     child: _logs.isEmpty
@@ -477,10 +474,11 @@ class _BuildApkPageState extends State<BuildApkPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: _logs.map((log) {
                                 Color c = const Color(0xFF888888);
-                                if (log.contains('[SUCCESS]') || log.contains('[OK]') || log.contains('[DONE]')) c = const Color(0xFF39FF14);
+                                if (log.contains('[DONE]') || log.contains('[OK]')) c = const Color(0xFF39FF14);
                                 else if (log.contains('[ERROR]') || log.contains('[!]')) c = const Color(0xFFFF6B6B);
                                 else if (log.contains('[INFO]')) c = const Color(0xFF00D4FF);
-                                else if (log.contains('[APK]') || log.contains('=== BUILD')) c = const Color(0xFFFFE74C);
+                                else if (log.contains('[URL]')) c = const Color(0xFFAAAAAA);
+                                else if (log.contains('=== ')) c = const Color(0xFFFFE74C);
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 1),
                                   child: Text(log, style: TextStyle(color: c, fontSize: 11, fontFamily: 'ShareTechMono', height: 1.4)),
