@@ -35,7 +35,7 @@ dependencies:
   local_auth: ^2.1.8
   
   # ============ TAMBAHAN UNTUK TOOLS ============
-  file_picker: ^5.3.3
+  file_picker: ^8.0.0
   wifi_iot: ^0.3.0
   fluttertoast: ^8.2.1
   # ============================================

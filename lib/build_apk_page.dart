@@ -254,15 +254,6 @@ class _BuildApkPageState extends State<BuildApkPage> {
                   ),
                   const SizedBox(height: 12),
                   if (_building || _downloading) ...[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: _progress > 0 ? _progress : null,
-                        backgroundColor: const Color(0xFF222222),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFFFFE74C)),
-                        minHeight: 6,
-                      ),
-                    ),
                     const SizedBox(height: 12),
                   ],
                   if (_status == "SUCCESS" && _apkFile != null) ...[
