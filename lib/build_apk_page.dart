@@ -169,7 +169,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
   }
 
   void _copyPackageId() {
-    Clipboard.setData(const ClipboardData(text: _packageName));
+    Clipboard.setData(ClipboardData(text: _packageName));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Package ID copied!"), backgroundColor: Color(0xFF00D4FF)),
