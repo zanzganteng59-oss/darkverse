@@ -190,7 +190,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
       final res = await http.get(Uri.parse(fullUrl)).timeout(const Duration(seconds: 120));
       if (res.statusCode == 200) {
         final dir = await getTemporaryDirectory();
-        final file = File('${'$'}{dir.path}/PRX_Panel.apk');
+        final file = File('${dir.path}/PRX_Panel.apk');
         await file.writeAsBytes(res.bodyBytes);
         _addLog("[OK] APK downloaded (${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB)", const Color(0xFF39FF14));
         await Share.shareXFiles([XFile(file.path)], text: '$_appName APK Build', subject: 'PRX Panel APK');
@@ -214,7 +214,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
       final res = await http.get(Uri.parse(fullUrl)).timeout(const Duration(seconds: 120));
       if (res.statusCode == 200) {
         final dir = await getApplicationDocumentsDirectory();
-        final file = File('${'$'}{dir.path}/PRX_Panel.apk');
+        final file = File('${dir.path}/PRX_Panel.apk');
         await file.writeAsBytes(res.bodyBytes);
         _addLog("[DONE] APK saved: ${file.path}", const Color(0xFF39FF14));
         _addLog("[INFO] Size: ${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB", const Color(0xFF00D4FF));
