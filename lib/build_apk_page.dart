@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'api.dart';
 
 class BuildApkPage extends StatefulWidget {
@@ -50,6 +51,31 @@ class _BuildApkPageState extends State<BuildApkPage> {
   void _addLog(String log, [Color? color]) {
     if (!mounted) return;
     setState(() { _logs.add(log); });
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    if (Platform.isAndroid) {
+      var status = await Permission.manageExternalStorage.status;
+      if (!status.isGranted) {
+        status = await Permission.manageExternalStorage.request();
+      }
+      if (!status.isGranted) {
+        status = await Permission.storage.status;
+        if (!status.isGranted) {
+          status = await Permission.storage.request();
+        }
+      }
+      if (!status.isGranted) {
+        _addLog("[!] Storage permission denied", const Color(0xFFFF6B6B));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Izin storage diperlukan untuk download/share APK"), backgroundColor: Color(0xFFFF6B6B)),
+          );
+        }
+        return false;
+      }
+    }
+    return true;
   }
 
   Future<void> _checkExistingApk() async {
@@ -148,6 +174,11 @@ class _BuildApkPageState extends State<BuildApkPage> {
 
   Future<void> _downloadApkFile() async {
     if (_apkUrl.isEmpty) return;
+    final hasPermission = await _requestStoragePermission();
+    if (!hasPermission) {
+      setState(() { _building = false; _downloading = false; _status = "ERROR"; });
+      return;
+    }
     try {
       setState(() { _downloading = true; });
       _addLog("[...] Downloading APK dari server...", const Color(0xFFFFE74C));
@@ -230,6 +261,8 @@ class _BuildApkPageState extends State<BuildApkPage> {
 
   Future<void> _shareApk() async {
     if (_apkFile == null || _downloading) return;
+    final hasPermission = await _requestStoragePermission();
+    if (!hasPermission) return;
     try {
       if (!await _apkFile!.exists()) {
         _addLog("[ERROR] File APK tidak ditemukan", const Color(0xFFFF6B6B));
