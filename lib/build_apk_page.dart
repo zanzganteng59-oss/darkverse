@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import 'api.dart';
 
 class BuildApkPage extends StatefulWidget {
@@ -177,10 +179,60 @@ class _BuildApkPageState extends State<BuildApkPage> {
     }
   }
 
+  bool _downloading = false;
+
   Future<void> _shareApk() async {
-    if (_apkUrl.isEmpty) return;
-    final fullUrl = '${ApiConfig.baseUrl}$_apkUrl';
-    await Share.share('Download APK: $fullUrl', subject: '$_appName Build');
+    if (_apkUrl.isEmpty || _downloading) return;
+    try {
+      setState(() { _downloading = true; });
+      _addLog("[...] Downloading APK untuk share...", const Color(0xFFFFE74C));
+      final fullUrl = '${ApiConfig.baseUrl}$_apkUrl';
+      final res = await http.get(Uri.parse(fullUrl)).timeout(const Duration(seconds: 120));
+      if (res.statusCode == 200) {
+        final dir = await getTemporaryDirectory();
+        final file = File('${'$'}{dir.path}/PRX_Panel.apk');
+        await file.writeAsBytes(res.bodyBytes);
+        _addLog("[OK] APK downloaded (${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB)", const Color(0xFF39FF14));
+        await Share.shareXFiles([XFile(file.path)], text: '$_appName APK Build', subject: 'PRX Panel APK');
+        _addLog("[OK] Share dialog opened!", const Color(0xFF39FF14));
+      } else {
+        _addLog("[ERROR] Download gagal: ${res.statusCode}", const Color(0xFFFF6B6B));
+      }
+    } catch (e) {
+      _addLog("[ERROR] Share gagal: $e", const Color(0xFFFF6B6B));
+    } finally {
+      setState(() { _downloading = false; });
+    }
+  }
+
+  Future<void> _downloadApk() async {
+    if (_apkUrl.isEmpty || _downloading) return;
+    try {
+      setState(() { _downloading = true; });
+      _addLog("[...] Downloading APK...", const Color(0xFFFFE74C));
+      final fullUrl = '${ApiConfig.baseUrl}$_apkUrl';
+      final res = await http.get(Uri.parse(fullUrl)).timeout(const Duration(seconds: 120));
+      if (res.statusCode == 200) {
+        final dir = await getApplicationDocumentsDirectory();
+        final file = File('${'$'}{dir.path}/PRX_Panel.apk');
+        await file.writeAsBytes(res.bodyBytes);
+        _addLog("[DONE] APK saved: ${file.path}", const Color(0xFF39FF14));
+        _addLog("[INFO] Size: ${(res.bodyBytes.length / 1024 / 1024).toStringAsFixed(1)}MB", const Color(0xFF00D4FF));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("APK saved: ${file.path}"),
+            backgroundColor: const Color(0xFF39FF14),
+            action: SnackBarAction(label: "OPEN", textColor: Colors.black, onPressed: () {}),
+          ));
+        }
+      } else {
+        _addLog("[ERROR] Download gagal: ${res.statusCode}", const Color(0xFFFF6B6B));
+      }
+    } catch (e) {
+      _addLog("[ERROR] Download gagal: $e", const Color(0xFFFF6B6B));
+    } finally {
+      setState(() { _downloading = false; });
+    }
   }
 
   Color _statusColor() {
@@ -350,11 +402,22 @@ class _BuildApkPageState extends State<BuildApkPage> {
                       if (_apkUrl.isNotEmpty) ...[
                         const SizedBox(width: 10),
                         GestureDetector(
-                          onTap: _shareApk,
+                          onTap: _downloading ? null : _shareApk,
                           child: Container(
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: const Color(0xFF39FF14), borderRadius: BorderRadius.circular(10)),
-                            child: const Icon(Icons.share_rounded, color: Colors.black, size: 20),
+                            decoration: BoxDecoration(color: _downloading ? const Color(0xFF333333) : const Color(0xFF39FF14), borderRadius: BorderRadius.circular(10)),
+                            child: _downloading
+                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Icon(Icons.share_rounded, color: Colors.black, size: 20),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: _downloading ? null : _downloadApk,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: _downloading ? const Color(0xFF333333) : const Color(0xFF00D4FF), borderRadius: BorderRadius.circular(10)),
+                            child: const Icon(Icons.download_rounded, color: Colors.black, size: 20),
                           ),
                         ),
                       ],
