@@ -92,7 +92,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
   Future<void> _triggerBuild() async {
     if (_building || _downloading) return;
     final url = Uri.parse("https://github.com/$_githubRepo/actions");
-    _addLog("[...] Opening GitHub Actions...", const Color(0xFFFFE74C));
+    _addLog("[...] Membuka halaman build...", const Color(0xFFFFE74C));
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
       _addLog("[OK] Buka browser untuk download APK", const Color(0xFF39FF14));
@@ -300,7 +300,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            "Tap BUILD untuk buka GitHub, download APK, lalu tap PICK APK. Atau PICK APK langsung dari storage.",
+                            "Tap BUILD untuk buka halaman build, download APK, lalu tap PICK APK. Atau PICK APK langsung dari storage.",
                             style: TextStyle(color: Color(0xFFFFE74C), fontSize: 11, fontFamily: 'Inter', height: 1.3),
                           ),
                         ),
