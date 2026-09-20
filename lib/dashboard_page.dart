@@ -492,6 +492,11 @@ class _DashboardPageState extends State<DashboardPage>
   double _currentNewsPage = 0.0;
   Timer? _newsTimer;
 
+  // HOT NEWS auto-rotate
+  int _hotNewsIndex = 0;
+  Timer? _hotNewsTimer;
+  late PageController _hotNewsController;
+
   // 🕌 JADWAL SHOLAT
   Map<String, dynamic>? _jadwalSholat;
   List<dynamic> _cityList = [];
@@ -591,6 +596,20 @@ class _DashboardPageState extends State<DashboardPage>
       }
     });
 
+    _hotNewsController = PageController();
+    _hotNewsTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (mounted) {
+        setState(() {
+          _hotNewsIndex = (_hotNewsIndex + 1) % 6;
+        });
+        _hotNewsController.animateToPage(
+          _hotNewsIndex,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+
     try {
       _selectedPage = _buildNewsPage();
     } catch (e) {
@@ -624,6 +643,8 @@ class _DashboardPageState extends State<DashboardPage>
     _signalTimer?.cancel();
     _entranceCtrl.dispose();
     _glowCtrl.dispose();
+    _hotNewsTimer?.cancel();
+    _hotNewsController.dispose();
     super.dispose();
   }
 
@@ -1508,6 +1529,11 @@ class _DashboardPageState extends State<DashboardPage>
               _serverPing = pingMs;
             });
           }
+          if (data['type'] == 'publicChat:online' && data['users'] is List) {
+            setState(() {
+              onlineUsers = (data['users'] as List).length;
+            });
+          }
         },
         onError: (error) {
           debugPrint('WebSocket error: $error');
@@ -1934,7 +1960,7 @@ class _DashboardPageState extends State<DashboardPage>
 
     return Container(
       height: 68,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       decoration: BoxDecoration(
         color: _cardBg,
         border: Border.all(color: _borderColor, width: 3),
@@ -2607,12 +2633,12 @@ class _DashboardPageState extends State<DashboardPage>
   // ════════ HOT NEWS ════════
   Widget _buildHotNewsSection() {
     final hotTopics = [
-      {"icon": "🔥", "title": "AI Regulation", "desc": "EU AI Act diberlakukan, tech giant harus comply"},
-      {"icon": "⚡", "title": "Crypto Rally", "desc": "Bitcoin tembus 120K, altcoin naik signifikan"},
-      {"icon": "🛡️", "title": "Zero-Day Exploit", "desc": "CVE baru ditemukan di Android, segera update"},
-      {"icon": "🚀", "title": "SpaceX Starship", "desc": "Misi Mars 2026 berhasil dock"},
-      {"icon": "🌐", "title": "5G Expansion", "desc": "Indonesia target 80% coverage 2026"},
-      {"icon": "🤖", "title": "GPT-5 Release", "desc": "OpenAI rilis model terbaru, reasoning makin kuat"},
+      {"icon": "🔥", "title": "AI Regulation", "desc": "EU AI Act diberlakukan, tech giant harus comply", "time": "2m ago"},
+      {"icon": "⚡", "title": "Crypto Rally", "desc": "Bitcoin tembus 120K, altcoin naik signifikan", "time": "5m ago"},
+      {"icon": "🛡️", "title": "Zero-Day Exploit", "desc": "CVE baru ditemukan di Android, segera update", "time": "8m ago"},
+      {"icon": "🚀", "title": "SpaceX Starship", "desc": "Misi Mars 2026 berhasil dock", "time": "12m ago"},
+      {"icon": "🌐", "title": "5G Expansion", "desc": "Indonesia target 80% coverage 2026", "time": "15m ago"},
+      {"icon": "🤖", "title": "GPT-5 Release", "desc": "OpenAI rilis model terbaru, reasoning makin kuat", "time": "20m ago"},
     ];
 
     return Container(
@@ -2645,34 +2671,58 @@ class _DashboardPageState extends State<DashboardPage>
           const SizedBox(height: 12),
           SizedBox(
             height: 120,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
+            child: PageView.builder(
+              controller: _hotNewsController,
               itemCount: hotTopics.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              onPageChanged: (i) => setState(() => _hotNewsIndex = i),
               itemBuilder: (ctx, i) {
                 final t = hotTopics[i];
                 return Container(
-                  width: 140,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: _nbBlack,
                     border: Border.all(color: _borderColor, width: 2),
                     boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(2, 2), blurRadius: 0)],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(t["icon"]!, style: const TextStyle(fontSize: 20)),
-                      const SizedBox(height: 6),
-                      Text(t["title"]!, style: TextStyle(color: _nbYellow, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
-                      const SizedBox(height: 4),
-                      Expanded(child: Text(t["desc"]!, style: TextStyle(color: Colors.grey[500], fontSize: 10, fontFamily: 'Inter', height: 1.3), maxLines: 3, overflow: TextOverflow.ellipsis)),
+                      Text(t["icon"]!, style: const TextStyle(fontSize: 28)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(t["title"]!, style: TextStyle(color: _nbYellow, fontSize: 13, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+                            const SizedBox(height: 4),
+                            Text(t["desc"]!, style: TextStyle(color: Colors.grey[500], fontSize: 10, fontFamily: 'Inter', height: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(t["time"]!, style: TextStyle(color: _nbRed, fontSize: 9, fontWeight: FontWeight.w700, fontFamily: 'Inter')),
                     ],
                   ),
                 );
               },
             ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(hotTopics.length, (i) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: _hotNewsIndex == i ? 16 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: _hotNewsIndex == i ? _nbRed : _nbRed.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              );
+            }),
           ),
         ],
       ),
@@ -2682,8 +2732,6 @@ class _DashboardPageState extends State<DashboardPage>
   // ════════ MAIN BUILD ════════
   Widget _buildNewsPage() {
     final now = DateTime.now();
-    final hour = now.hour;
-    final greeting = hour < 12 ? "Selamat Pagi" : hour < 17 ? "Selamat Siang" : "Selamat Malam";
     final dateStr = "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}";
 
     return Stack(
@@ -2714,13 +2762,7 @@ class _DashboardPageState extends State<DashboardPage>
                           AnimatedBuilder(animation: _glowAnim, builder: (ctx, _) => Icon(Icons.shield_rounded, color: _nbYellow, size: 22 + _glowAnim.value * 2)),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(greeting, style: TextStyle(color: _nbYellow.withValues(alpha: 0.6), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
-                                _MegatronIntro(textColor: _nbYellow, glowColor: _nbYellow, fontSize: 20),
-                              ],
-                            ),
+                            child: _MegatronIntro(textColor: _nbYellow, glowColor: _nbYellow, fontSize: 20),
                           ),
                           Text(dateStr, style: TextStyle(color: _nbYellow.withValues(alpha: 0.6), fontSize: 10, fontFamily: 'Inter')),
                           const SizedBox(width: 8),

