@@ -27,18 +27,26 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
       _resultCtrl.clear();
     });
     try {
-      final target = url.startsWith("http") ? url : "http://$url";
-      final resp = await http.get(
-        Uri.parse(target),
-        headers: {"User-Agent": "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36"},
-      ).timeout(const Duration(seconds: 15));
-      setState(() {
-        _resultCtrl.text = utf8.decode(resp.bodyBytes);
-        _loading = false;
-      });
+      final resp = await http.post(
+        Uri.parse("${ApiConfig.baseUrl}/api/source-fetch"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"url": url}),
+      ).timeout(const Duration(seconds: 20));
+      final data = jsonDecode(resp.body);
+      if (resp.statusCode == 200 && data['source'] != null) {
+        setState(() {
+          _resultCtrl.text = data['source'];
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _error = data['error'] ?? "Gagal mengambil source";
+          _loading = false;
+        });
+      }
     } catch (e) {
       setState(() {
-        _error = "Gagal mengambil source: $e";
+        _error = "Gagal koneksi ke server: $e";
         _loading = false;
       });
     }
@@ -87,7 +95,9 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       color: Colors.cyanAccent,
-                      child: const Icon(Icons.search, color: Colors.black, size: 22),
+                      child: _loading
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                          : const Icon(Icons.search, color: Colors.black, size: 22),
                     ),
                   ),
                 ],
@@ -99,7 +109,10 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
             else if (_error != null)
               Expanded(
                 child: Center(
-                  child: Text(_error!, style: const TextStyle(color: Colors.redAccent, fontFamily: 'Inter')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.redAccent, fontFamily: 'Inter', fontSize: 13)),
+                  ),
                 ),
               )
             else
