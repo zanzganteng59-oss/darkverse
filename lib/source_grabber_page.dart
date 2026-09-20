@@ -21,19 +21,31 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
       setState(() => _error = "Masukkan URL website");
       return;
     }
+    if (!url.contains(".")) {
+      setState(() => _error = "URL tidak valid. Contoh: example.com");
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
       _resultCtrl.clear();
     });
     try {
+      final serverUrl = "${ApiConfig.baseUrl}/api/source-fetch";
       final resp = await http.post(
-        Uri.parse("${ApiConfig.baseUrl}/api/source-fetch"),
+        Uri.parse(serverUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"url": url}),
       ).timeout(const Duration(seconds: 20));
+      if (resp.statusCode != 200) {
+        setState(() {
+          _error = "Server error ${resp.statusCode}. Pastikan server sudah restart.";
+          _loading = false;
+        });
+        return;
+      }
       final data = jsonDecode(resp.body);
-      if (resp.statusCode == 200 && data['source'] != null) {
+      if (data['source'] != null) {
         setState(() {
           _resultCtrl.text = data['source'];
           _loading = false;
@@ -46,7 +58,16 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
       }
     } catch (e) {
       setState(() {
-        _error = "Gagal koneksi ke server: $e";
+        final msg = e.toString();
+        if (msg.contains("Connection refused") || msg.contains("SocketException")) {
+          _error = "Server offline. Pastikan server aktif.";
+        } else if (msg.contains("TimeoutException")) {
+          _error = "Request timeout. Target terlalu lambat.";
+        } else if (msg.contains("FormatException") || msg.contains("Invalid URL")) {
+          _error = "URL tidak valid: $url";
+        } else {
+          _error = "Error: $msg";
+        }
         _loading = false;
       });
     }

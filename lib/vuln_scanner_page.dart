@@ -17,18 +17,32 @@ class _VulnScannerPageState extends State<VulnScannerPage> {
   Future<void> _startScan() async {
     final url = _urlCtrl.text.trim();
     if (url.isEmpty) return;
+    if (!url.contains(".")) {
+      setState(() {
+        _results = [{"label": "Input", "status": "danger", "detail": "URL tidak valid. Contoh: example.com"}];
+      });
+      return;
+    }
     setState(() {
       _loading = true;
       _results = [];
     });
     try {
+      final serverUrl = "${ApiConfig.baseUrl}/api/vuln-scan";
       final resp = await http.post(
-        Uri.parse("${ApiConfig.baseUrl}/api/vuln-scan"),
+        Uri.parse(serverUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"url": url}),
       ).timeout(const Duration(seconds: 30));
+      if (resp.statusCode != 200) {
+        setState(() {
+          _results = [{"label": "Server", "status": "danger", "detail": "Server error ${resp.statusCode}. Pastikan server sudah restart."}];
+          _loading = false;
+        });
+        return;
+      }
       final data = jsonDecode(resp.body);
-      if (resp.statusCode == 200 && data['results'] != null) {
+      if (data['results'] != null) {
         setState(() {
           _results = List<Map<String, dynamic>>.from(data['results'].map((r) => Map<String, dynamic>.from(r)));
           _loading = false;
@@ -40,8 +54,19 @@ class _VulnScannerPageState extends State<VulnScannerPage> {
         });
       }
     } catch (e) {
+      final msg = e.toString();
+      String detail;
+      if (msg.contains("Connection refused") || msg.contains("SocketException")) {
+        detail = "Server offline. Pastikan server aktif.";
+      } else if (msg.contains("TimeoutException")) {
+        detail = "Request timeout. Target terlalu lambat.";
+      } else if (msg.contains("FormatException") || msg.contains("Invalid URL")) {
+        detail = "URL tidak valid: $url";
+      } else {
+        detail = "Error: $msg";
+      }
       setState(() {
-        _results = [{"label": "Connection", "status": "danger", "detail": "Gagal koneksi ke server: $e"}];
+        _results = [{"label": "Connection", "status": "danger", "detail": detail}];
         _loading = false;
       });
     }
