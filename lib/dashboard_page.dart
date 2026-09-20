@@ -1534,6 +1534,10 @@ class _DashboardPageState extends State<DashboardPage>
               onlineUsers = (data['users'] as List).length;
             });
           }
+          if (data['type'] == 'announcement' && data['announcement'] != null) {
+            final ann = data['announcement'];
+            _showAnnouncementDialog(ann['title'] ?? 'Pengumuman', ann['message'] ?? '', ann['from'] ?? 'Admin');
+          }
         },
         onError: (error) {
           debugPrint('WebSocket error: $error');
@@ -1588,6 +1592,43 @@ class _DashboardPageState extends State<DashboardPage>
               (route) => false,
             ),
             child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAnnouncementDialog(String title, String message, String from) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF111118),
+        shape: Border.all(color: Colors.amberAccent, width: 2),
+        title: Row(
+          children: [
+            const Icon(Icons.campaign, color: Colors.amberAccent, size: 24),
+            const SizedBox(width: 8),
+            Expanded(child: Text(title, style: const TextStyle(color: Colors.amberAccent, fontFamily: 'Inter', fontWeight: FontWeight.w900))),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(message, style: const TextStyle(color: Colors.white, fontFamily: 'Inter', fontSize: 14)),
+            const SizedBox(height: 8),
+            Text("Dari: $from", style: TextStyle(color: Colors.grey[500], fontFamily: 'Inter', fontSize: 11)),
+          ],
+        ),
+        actions: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              color: Colors.amberAccent,
+              child: const Text("OK", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+            ),
           ),
         ],
       ),

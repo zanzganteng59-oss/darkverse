@@ -90,7 +90,7 @@ class ContactPage extends StatelessWidget {
                   subtitle: "@zanzsii_md",
                   icon: FontAwesomeIcons.telegram,
                   brandColor: const Color(0xFF2AABEE),
-                  url: "https://t.me/zanzsii_md",
+                  url: "https://t.me/zanzsii",
                 ),
                 const SizedBox(height: 12),
                 _buildContactButton(

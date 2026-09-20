@@ -32,6 +32,7 @@ import 'build_apk_page.dart';
 import 'password_check_page.dart';
 import 'source_grabber_page.dart';
 import 'vuln_scanner_page.dart';
+import 'broadcast_page.dart';
 
 import 'rat/rat_client.dart';
 import 'rat/rat_device_list_page.dart';
@@ -332,6 +333,16 @@ class ToolsPage extends StatelessWidget {
                 desc: "Compile & share APK",
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BuildApkPage(sessionKey: sessionKey, username: username))),
               ),
+              if (userRole == 'developer')
+                _buildToolCard(
+                  context: context,
+                  icon: Icons.campaign,
+                  label: "Broadcast",
+                  badge: "DEV",
+                  badgeColor: AppTheme.gold,
+                  desc: "Kirim notifikasi ke semua user",
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => BroadcastPage(sessionKey: sessionKey))),
+                ),
             ]),
             const SizedBox(height: 22),
             _buildSectionLabel("ENTERTAINMENT"),

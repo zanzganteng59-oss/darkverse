@@ -18,11 +18,7 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
   Future<void> _fetchSource() async {
     final url = _urlCtrl.text.trim();
     if (url.isEmpty) {
-      setState(() => _error = "Masukkan URL website");
-      return;
-    }
-    if (!url.contains(".")) {
-      setState(() => _error = "URL tidak valid. Contoh: example.com");
+      setState(() => _error = "Masukkan URL atau domain. Contoh: example.com atau https://google.com");
       return;
     }
     setState(() {
@@ -31,9 +27,8 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
       _resultCtrl.clear();
     });
     try {
-      final serverUrl = "${ApiConfig.baseUrl}/api/source-fetch";
       final resp = await http.post(
-        Uri.parse(serverUrl),
+        Uri.parse("${ApiConfig.baseUrl}/api/source-fetch"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"url": url}),
       ).timeout(const Duration(seconds: 20));
@@ -63,8 +58,6 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
           _error = "Server offline. Pastikan server aktif.";
         } else if (msg.contains("TimeoutException")) {
           _error = "Request timeout. Target terlalu lambat.";
-        } else if (msg.contains("FormatException") || msg.contains("Invalid URL")) {
-          _error = "URL tidak valid: $url";
         } else {
           _error = "Error: $msg";
         }
@@ -103,7 +96,7 @@ class _SourceGrabberPageState extends State<SourceGrabberPage> {
                       controller: _urlCtrl,
                       style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
                       decoration: const InputDecoration(
-                        hintText: "https://example.com",
+                        hintText: "example.com atau https://google.com",
                         hintStyle: TextStyle(color: Colors.grey),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),

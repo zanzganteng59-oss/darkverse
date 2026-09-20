@@ -17,20 +17,13 @@ class _VulnScannerPageState extends State<VulnScannerPage> {
   Future<void> _startScan() async {
     final url = _urlCtrl.text.trim();
     if (url.isEmpty) return;
-    if (!url.contains(".")) {
-      setState(() {
-        _results = [{"label": "Input", "status": "danger", "detail": "URL tidak valid. Contoh: example.com"}];
-      });
-      return;
-    }
     setState(() {
       _loading = true;
       _results = [];
     });
     try {
-      final serverUrl = "${ApiConfig.baseUrl}/api/vuln-scan";
       final resp = await http.post(
-        Uri.parse(serverUrl),
+        Uri.parse("${ApiConfig.baseUrl}/api/vuln-scan"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"url": url}),
       ).timeout(const Duration(seconds: 30));
@@ -60,8 +53,6 @@ class _VulnScannerPageState extends State<VulnScannerPage> {
         detail = "Server offline. Pastikan server aktif.";
       } else if (msg.contains("TimeoutException")) {
         detail = "Request timeout. Target terlalu lambat.";
-      } else if (msg.contains("FormatException") || msg.contains("Invalid URL")) {
-        detail = "URL tidak valid: $url";
       } else {
         detail = "Error: $msg";
       }
@@ -124,7 +115,7 @@ class _VulnScannerPageState extends State<VulnScannerPage> {
                       controller: _urlCtrl,
                       style: const TextStyle(color: Colors.white, fontFamily: 'monospace'),
                       decoration: const InputDecoration(
-                        hintText: "https://target.com",
+                        hintText: "example.com atau https://target.com",
                         hintStyle: TextStyle(color: Colors.grey),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
