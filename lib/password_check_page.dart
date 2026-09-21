@@ -116,7 +116,7 @@ class _PasswordCheckPageState extends State<PasswordCheckPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("PASSWORD", style: TextStyle(color: Color(0xFF666666), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
+                            const Text("PASSWORD", style: TextStyle(color: Color(0xFF888888), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
                             const SizedBox(height: 8),
                             Row(
                               children: [
@@ -154,7 +154,7 @@ class _PasswordCheckPageState extends State<PasswordCheckPage> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(color: const Color(0xFF181C28), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF2A2F3E), width: 1)),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                const Text("ROLE", style: TextStyle(color: Color(0xFF666666), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
+                                const Text("ROLE", style: TextStyle(color: Color(0xFF888888), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
                                 const SizedBox(height: 4),
                                 Text(_role.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
                               ]),
@@ -166,7 +166,7 @@ class _PasswordCheckPageState extends State<PasswordCheckPage> {
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(color: const Color(0xFF181C28), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF2A2F3E), width: 1)),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                const Text("EXPIRED", style: TextStyle(color: Color(0xFF666666), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
+                                const Text("EXPIRED", style: TextStyle(color: Color(0xFF888888), fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
                                 const SizedBox(height: 4),
                                 Text(_expiredDate, style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 14, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
                               ]),

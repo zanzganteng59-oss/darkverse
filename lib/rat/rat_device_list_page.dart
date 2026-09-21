@@ -105,7 +105,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Neo.radiusM),
           color: Neo.white,
-          border: Border.all(color: Neo.black, width: Neo.borderWB),
+          border: Border.all(color: Neo.textDark, width: Neo.borderWB),
           boxShadow: Neo.shadow(offset: 5),
         ),
         child: Row(
@@ -116,7 +116,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Neo.radiusS),
                 color: Neo.lavender,
-                border: Border.all(color: Neo.black, width: 2),
+                border: Border.all(color: Neo.textDark, width: 2),
               ),
               child: const Icon(Icons.phonelink_rounded,
                   color: Neo.white, size: 20),
@@ -129,7 +129,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
                   const Text(
                     'PERANGKAT RAT',
                     style: TextStyle(
-                      color: Neo.black,
+                      color: Neo.textDark,
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
                       letterSpacing: 1,
@@ -159,11 +159,11 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
                 height: 40,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Neo.black, width: 2),
+                  border: Border.all(color: Neo.textDark, width: 2),
                   color: Neo.mint,
                 ),
                 child: const Icon(Icons.refresh_rounded,
-                    color: Neo.black, size: 20),
+                    color: Neo.textDark, size: 20),
               ),
             ),
           ],
@@ -181,7 +181,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Neo.radiusM),
           color: Neo.white,
-          border: Border.all(color: Neo.black, width: Neo.borderW),
+          border: Border.all(color: Neo.textDark, width: Neo.borderW),
           boxShadow: Neo.shadow(offset: 4),
         ),
         child: Row(
@@ -191,10 +191,10 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
               height: 38,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Neo.radiusS),
-                border: Border.all(color: Neo.black, width: 2),
+                border: Border.all(color: Neo.textDark, width: 2),
                 color: Neo.mint,
               ),
-              child: const Icon(Icons.fingerprint, color: Neo.black, size: 18),
+              child: const Icon(Icons.fingerprint, color: Neo.textDark, size: 18),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -217,7 +217,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1,
-                      color: uid != null ? Neo.black : Neo.textMuted,
+                      color: uid != null ? Neo.textDark : Neo.textMuted,
                     ),
                   ),
                 ],
@@ -236,20 +236,20 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(Neo.radiusS),
                     color: Neo.mint,
-                    border: Border.all(color: Neo.black, width: 2),
+                    border: Border.all(color: Neo.textDark, width: 2),
                     boxShadow: Neo.shadow(offset: 3),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.copy, size: 13, color: Neo.black),
+                      Icon(Icons.copy, size: 13, color: Neo.textDark),
                       SizedBox(width: 6),
                       Text('SALIN',
                           style: TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 9,
                               letterSpacing: 1.5,
-                              color: Neo.black)),
+                              color: Neo.textDark)),
                     ],
                   ),
                 ),
@@ -318,7 +318,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Neo.coral,
-                border: Border.all(color: Neo.black, width: 3),
+                border: Border.all(color: Neo.textDark, width: 3),
                 boxShadow: Neo.shadow(offset: 4),
               ),
               child: const Icon(Icons.error_outline,
@@ -330,7 +330,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
               textAlign: TextAlign.center,
               style: const TextStyle(
                   fontFamily: 'ShareTechMono',
-                  color: Neo.black,
+                  color: Neo.textDark,
                   fontSize: 13,
                   letterSpacing: 1),
             ),
@@ -373,13 +373,13 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(Neo.radiusL),
               color: Neo.cream,
-              border: Border.all(color: Neo.black, width: Neo.borderWB),
+              border: Border.all(color: Neo.textDark, width: Neo.borderWB),
               boxShadow: Neo.shadow(offset: 6),
             ),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(Neo.radiusM),
-                border: Border.all(color: Neo.black, width: 2),
+                border: Border.all(color: Neo.textDark, width: 2),
                 color: Neo.white,
               ),
               child: Stack(
@@ -409,7 +409,7 @@ class _RatDeviceListPageState extends State<RatDeviceListPage> {
                 fontFamily: 'ShareTechMono',
                 fontSize: 12,
                 letterSpacing: 2,
-                color: Neo.black),
+                color: Neo.textDark),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -461,11 +461,11 @@ void _renameDeviceDialog(BuildContext context, RatClient client, RatDevice devic
       backgroundColor: Neo.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Neo.radiusM),
-        side: const BorderSide(color: Neo.black, width: Neo.borderWB),
+        side: const BorderSide(color: Neo.textDark, width: Neo.borderWB),
       ),
       elevation: 0,
       title: const Text('RENAME DEVICE',
-          style: TextStyle(color: Neo.black, fontWeight: FontWeight.w800, letterSpacing: 1)),
+          style: TextStyle(color: Neo.textDark, fontWeight: FontWeight.w800, letterSpacing: 1)),
       content: NeoInput(
         controller: ctrl,
         hint: 'Nama baru device',
@@ -518,27 +518,27 @@ class _StatChip extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Neo.radiusS),
         color: color,
-        border: Border.all(color: Neo.black, width: 2),
+        border: Border.all(color: Neo.textDark, width: 2),
         boxShadow: Neo.shadow(offset: 3),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 9, color: Neo.black),
+          Icon(icon, size: 9, color: Neo.textDark),
           const SizedBox(width: 6),
           Text(label,
               style: const TextStyle(
                   fontFamily: 'ShareTechMono',
                   fontSize: 8,
                   letterSpacing: 1.2,
-                  color: Neo.black)),
+                  color: Neo.textDark)),
           const SizedBox(width: 6),
           Text('$value',
               style: const TextStyle(
                   fontFamily: 'ShareTechMono',
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
-                  color: Neo.black)),
+                  color: Neo.textDark)),
         ],
       ),
     );
@@ -566,7 +566,7 @@ class _PhoneCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(Neo.radiusL),
           color: Neo.white,
           border: Border.all(
-              color: Neo.black, width: online ? Neo.borderWB : Neo.borderW),
+              color: Neo.textDark, width: online ? Neo.borderWB : Neo.borderW),
           boxShadow: Neo.shadow(offset: online ? 5 : 3),
         ),
         child: Column(
@@ -580,7 +580,7 @@ class _PhoneCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: online ? Neo.mint : Neo.textMuted,
-                    border: Border.all(color: Neo.black, width: 1),
+                    border: Border.all(color: Neo.textDark, width: 1),
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -610,7 +610,7 @@ class _PhoneCard extends StatelessWidget {
                           style: TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 8,
-                              color: battery <= 20 ? Neo.coral : Neo.black)),
+                              color: battery <= 20 ? Neo.coral : Neo.textDark)),
                     ],
                   ),
               ],
@@ -621,7 +621,7 @@ class _PhoneCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(Neo.radiusM),
                   color: Neo.cream,
-                  border: Border.all(color: Neo.black, width: 2),
+                  border: Border.all(color: Neo.textDark, width: 2),
                 ),
                 child: Stack(
                   children: [
@@ -634,7 +634,7 @@ class _PhoneCard extends StatelessWidget {
                           width: 30,
                           height: 3.5,
                           decoration: BoxDecoration(
-                            color: Neo.black.withValues(alpha: 0.3),
+                            color: Neo.textDark.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),
@@ -649,7 +649,7 @@ class _PhoneCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: accent,
-                          border: Border.all(color: Neo.black, width: 1),
+                          border: Border.all(color: Neo.textDark, width: 1),
                         ),
                       ),
                     ),
@@ -668,7 +668,7 @@ class _PhoneCard extends StatelessWidget {
                                   fontFamily: 'ShareTechMono',
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: Neo.black),
+                                  color: Neo.textDark),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -735,7 +735,7 @@ class _ConnectingBar extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Neo.radiusM),
           color: Neo.peach,
-          border: Border.all(color: Neo.black, width: 2),
+          border: Border.all(color: Neo.textDark, width: 2),
           boxShadow: Neo.shadow(offset: 3),
         ),
         child: Row(
@@ -744,7 +744,7 @@ class _ConnectingBar extends StatelessWidget {
               width: 12,
               height: 12,
               child: CircularProgressIndicator(
-                  strokeWidth: 2, color: Neo.black),
+                  strokeWidth: 2, color: Neo.textDark),
             ),
             const SizedBox(width: 10),
             const Expanded(
@@ -753,7 +753,7 @@ class _ConnectingBar extends StatelessWidget {
                       fontFamily: 'ShareTechMono',
                       fontSize: 8,
                       letterSpacing: 1.5,
-                      color: Neo.black)),
+                      color: Neo.textDark)),
             ),
             GestureDetector(
               onTap: onRetry,
@@ -762,7 +762,7 @@ class _ConnectingBar extends StatelessWidget {
                       fontFamily: 'ShareTechMono',
                       fontSize: 9,
                       letterSpacing: 1,
-                      color: Neo.black)),
+                      color: Neo.textDark)),
             ),
           ],
         ),

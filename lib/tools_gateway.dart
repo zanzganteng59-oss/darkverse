@@ -54,7 +54,7 @@ class ToolsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: AppTheme.bgDeep,
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(12),
@@ -385,9 +385,8 @@ class ToolsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black, width: 3),
-        boxShadow: const [BoxShadow(color: Colors.black, offset: Offset(5, 5), blurRadius: 0)],
+        color: AppTheme.bgSurface,
+        border: Border.all(color: AppTheme.borderMedium, width: 1),
       ),
       child: Column(
         children: [
@@ -397,8 +396,8 @@ class ToolsPage extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF007AFF),
-                  border: Border.all(color: Colors.black, width: 3),
+                  color: AppTheme.sky,
+                  border: Border.all(color: AppTheme.borderMedium, width: 1),
                 ),
                 child: const Icon(Icons.shield, color: Colors.white, size: 24),
               ),
@@ -407,13 +406,13 @@ class ToolsPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "MEGATRON SPY",
                       style: TextStyle(
-                        color: Colors.black,
+                        color: AppTheme.gold,
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Courier',
+                        fontFamily: 'ShareTechMono',
                         letterSpacing: 2,
                       ),
                     ),
@@ -421,9 +420,9 @@ class ToolsPage extends StatelessWidget {
                     Text(
                       "TOOLS DASHBOARD",
                       style: TextStyle(
-                        color: Colors.black.withValues(alpha: 0.5),
+                        color: AppTheme.textSecondary,
                         fontSize: 10,
-                        fontFamily: 'Courier',
+                        fontFamily: 'ShareTechMono',
                         letterSpacing: 2,
                         fontWeight: FontWeight.w700,
                       ),
@@ -434,12 +433,12 @@ class ToolsPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF39FF14),
-                  border: Border.all(color: Colors.black, width: 2),
+                  color: AppTheme.neonGreen,
+                  border: Border.all(color: AppTheme.borderMedium, width: 1),
                 ),
                 child: Text(
                   userRole.toUpperCase(),
-                  style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w900, fontFamily: 'Courier', letterSpacing: 1),
+                  style: TextStyle(color: AppTheme.bgDeep, fontSize: 10, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono', letterSpacing: 1),
                 ),
               ),
             ],
@@ -447,9 +446,9 @@ class ToolsPage extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _buildHeaderStat(icon: Icons.flash_on, value: "${listDoos.length}", label: "Methods", color: const Color(0xFFFFE74C)),
-              _buildHeaderStat(icon: Icons.grid_view, value: "34", label: "Tools", color: const Color(0xFF007AFF)),
-              _buildHeaderStat(icon: Icons.lock_outline, value: "4", label: "Locked", color: const Color(0xFFFF3B30)),
+              _buildHeaderStat(icon: Icons.flash_on, value: "${listDoos.length}", label: "Methods", color: AppTheme.neonYellow),
+              _buildHeaderStat(icon: Icons.grid_view, value: "34", label: "Tools", color: AppTheme.sky),
+              _buildHeaderStat(icon: Icons.lock_outline, value: "4", label: "Locked", color: AppTheme.coral),
             ],
           ),
         ],
@@ -468,15 +467,15 @@ class ToolsPage extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 3),
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: Colors.black, width: 2),
+          color: color.withValues(alpha: 0.15),
+          border: Border.all(color: color.withValues(alpha: 0.4), width: 1),
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.black, size: 16),
+            Icon(icon, color: color, size: 16),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900, fontFamily: 'Courier')),
-            Text(label, style: TextStyle(color: Colors.black.withValues(alpha: 0.6), fontSize: 8, fontFamily: 'Courier', letterSpacing: 1, fontWeight: FontWeight.w700)),
+            Text(value, style: TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono')),
+            Text(label, style: TextStyle(color: AppTheme.textSecondary, fontSize: 8, fontFamily: 'ShareTechMono', letterSpacing: 1, fontWeight: FontWeight.w700)),
           ],
         ),
       ),
@@ -486,11 +485,11 @@ class ToolsPage extends StatelessWidget {
   Widget _buildStatBar() {
     return Row(
       children: [
-        _buildStatChip(icon: Icons.bolt, label: "${listDoos.length} Methods", color: const Color(0xFF39FF14)),
+        _buildStatChip(icon: Icons.bolt, label: "${listDoos.length} Methods", color: AppTheme.neonGreen),
         const SizedBox(width: 8),
-        _buildStatChip(icon: Icons.shield_outlined, label: userRole.toUpperCase(), color: const Color(0xFFFFE74C)),
+        _buildStatChip(icon: Icons.shield_outlined, label: userRole.toUpperCase(), color: AppTheme.neonYellow),
         const SizedBox(width: 8),
-        _buildStatChip(icon: Icons.update, label: "v2.0", color: const Color(0xFF007AFF)),
+        _buildStatChip(icon: Icons.update, label: "v2.0", color: AppTheme.sky),
       ],
     );
   }
@@ -504,18 +503,18 @@ class ToolsPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: Colors.black, width: 2),
+          color: color.withValues(alpha: 0.12),
+          border: Border.all(color: color.withValues(alpha: 0.35), width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.black, size: 13),
+            Icon(icon, color: color, size: 13),
             const SizedBox(width: 6),
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(color: Colors.black, fontSize: 9, fontFamily: 'Courier', fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                style: TextStyle(color: color, fontSize: 9, fontFamily: 'ShareTechMono', fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -529,24 +528,24 @@ class ToolsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border.all(color: Colors.black, width: 2),
+        color: AppTheme.bgCard,
+        border: Border.all(color: AppTheme.borderMedium, width: 1),
       ),
       child: Row(
         children: [
           Container(
             width: 8,
             height: 8,
-            color: const Color(0xFF39FF14),
+            color: AppTheme.neonGreen,
           ),
           const SizedBox(width: 10),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppTheme.textPrimary,
               fontSize: 12,
               fontWeight: FontWeight.w900,
-              fontFamily: 'Courier',
+              fontFamily: 'ShareTechMono',
               letterSpacing: 2,
             ),
           ),
@@ -570,7 +569,7 @@ class ToolsPage extends StatelessWidget {
     bool locked = false,
     required VoidCallback onTap,
   }) {
-    final Color accentColor = locked ? Colors.grey.shade400 : (badgeColor ?? const Color(0xFF007AFF));
+    final Color accentColor = locked ? AppTheme.textMuted : (badgeColor ?? AppTheme.sky);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -579,9 +578,8 @@ class ToolsPage extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: locked ? Colors.grey.shade200 : Colors.white,
-            border: Border.all(color: Colors.black, width: 3),
-            boxShadow: locked ? [] : const [BoxShadow(color: Colors.black, offset: Offset(3, 3), blurRadius: 0)],
+            color: locked ? AppTheme.bgCard.withValues(alpha: 0.5) : AppTheme.bgCard,
+            border: Border.all(color: locked ? AppTheme.borderSubtle : AppTheme.borderMedium, width: 1),
           ),
           child: Row(
             children: [
@@ -589,10 +587,10 @@ class ToolsPage extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: accentColor,
-                  border: Border.all(color: Colors.black, width: 2),
+                  color: accentColor.withValues(alpha: 0.2),
+                  border: Border.all(color: accentColor.withValues(alpha: 0.5), width: 1),
                 ),
-                child: Icon(icon, color: Colors.black, size: 20),
+                child: Icon(icon, color: accentColor, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -605,10 +603,10 @@ class ToolsPage extends StatelessWidget {
                           child: Text(
                             label,
                             style: TextStyle(
-                              color: locked ? Colors.grey : Colors.black,
+                              color: locked ? AppTheme.textMuted : AppTheme.textPrimary,
                               fontSize: 13,
                               fontWeight: FontWeight.w900,
-                              fontFamily: 'Courier',
+                              fontFamily: 'ShareTechMono',
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -619,10 +617,10 @@ class ToolsPage extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              border: Border.all(color: Colors.black, width: 1),
+                              color: AppTheme.bgInput,
+                              border: Border.all(color: AppTheme.borderSubtle, width: 1),
                             ),
-                            child: Text(subLabel, style: TextStyle(color: Colors.black, fontSize: 7, fontFamily: 'Courier', fontWeight: FontWeight.w700)),
+                            child: Text(subLabel, style: TextStyle(color: AppTheme.textSecondary, fontSize: 7, fontFamily: 'ShareTechMono', fontWeight: FontWeight.w700)),
                           ),
                         ],
                       ],
@@ -630,7 +628,7 @@ class ToolsPage extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       desc ?? "",
-                      style: TextStyle(color: locked ? Colors.grey : Colors.black54, fontSize: 10, fontFamily: 'Courier'),
+                      style: TextStyle(color: locked ? AppTheme.textMuted : AppTheme.textSecondary, fontSize: 10, fontFamily: 'ShareTechMono'),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -644,29 +642,29 @@ class ToolsPage extends StatelessWidget {
                   if (badge != null)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(color: accentColor, border: Border.all(color: Colors.black, width: 2)),
-                      child: Text(badge, style: const TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w900, fontFamily: 'Courier')),
+                      decoration: BoxDecoration(color: accentColor, border: Border.all(color: accentColor, width: 1)),
+                      child: Text(badge, style: TextStyle(color: AppTheme.bgDeep, fontSize: 8, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono')),
                     ),
                   if (badge == null) const SizedBox(height: 20),
                   const SizedBox(height: 4),
                   if (locked)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(color: Colors.grey.shade300, border: Border.all(color: Colors.black, width: 1)),
+                      decoration: BoxDecoration(color: AppTheme.bgInput, border: Border.all(color: AppTheme.borderSubtle, width: 1)),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.lock_outline, color: Colors.black54, size: 8),
+                          Icon(Icons.lock_outline, color: AppTheme.textMuted, size: 8),
                           const SizedBox(width: 3),
-                          Text("LOCKED", style: TextStyle(color: Colors.grey, fontSize: 7, fontFamily: 'Courier', fontWeight: FontWeight.w700)),
+                          Text("LOCKED", style: TextStyle(color: AppTheme.textMuted, fontSize: 7, fontFamily: 'ShareTechMono', fontWeight: FontWeight.w700)),
                         ],
                       ),
                     )
                   else
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(color: const Color(0xFF39FF14), border: Border.all(color: Colors.black, width: 1)),
-                      child: const Text("OPEN", style: TextStyle(color: Colors.black, fontSize: 7, fontFamily: 'Courier', fontWeight: FontWeight.w900)),
+                      decoration: BoxDecoration(color: AppTheme.neonGreen, border: Border.all(color: AppTheme.neonGreen, width: 1)),
+                      child: Text("OPEN", style: TextStyle(color: AppTheme.bgDeep, fontSize: 7, fontFamily: 'ShareTechMono', fontWeight: FontWeight.w900)),
                     ),
                 ],
               ),
@@ -681,10 +679,10 @@ class ToolsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: color,
-        border: Border.all(color: Colors.black, width: 2),
+        color: color.withValues(alpha: 0.2),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
       ),
-      child: Text(text, style: const TextStyle(color: Colors.black, fontSize: 7, fontWeight: FontWeight.w900, fontFamily: 'Courier')),
+      child: Text(text, style: TextStyle(color: color, fontSize: 7, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono')),
     );
   }
 
@@ -692,20 +690,19 @@ class ToolsPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF007AFF),
-        border: Border.all(color: Colors.black, width: 3),
-        boxShadow: const [BoxShadow(color: Colors.black, offset: Offset(4, 4), blurRadius: 0)],
+        color: AppTheme.sky,
+        border: Border.all(color: AppTheme.sky, width: 1),
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             "MEGATRON SPY",
-            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Courier', letterSpacing: 3),
+            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono', letterSpacing: 3),
           ),
           const SizedBox(height: 4),
           Text(
             "Powered by MEGATRON Team",
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 9, fontFamily: 'Courier'),
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 9, fontFamily: 'ShareTechMono'),
           ),
         ],
       ),
@@ -716,32 +713,32 @@ class ToolsPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.bgSurface,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Colors.black, width: 3),
+          side: const BorderSide(color: AppTheme.borderMedium, width: 1),
           borderRadius: BorderRadius.zero,
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
-              color: const Color(0xFFFFE74C),
-              child: const Icon(Icons.lock_clock, color: Colors.black, size: 20),
+              color: AppTheme.neonYellow,
+              child: Icon(Icons.lock_clock, color: AppTheme.bgDeep, size: 20),
             ),
             const SizedBox(width: 10),
-            const Text("COMING SOON", style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontFamily: 'Courier', fontSize: 16)),
+            Text("COMING SOON", style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono', fontSize: 16)),
           ],
         ),
-        content: const Text(
+        content: Text(
           "Fitur ini masih dalam tahap pengembangan.\nNantikan update selanjutnya.",
-          style: TextStyle(color: Colors.black54, fontSize: 12, fontFamily: 'Courier'),
+          style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, fontFamily: 'ShareTechMono'),
         ),
         actions: [
           Container(
-            color: Colors.black,
+            color: AppTheme.neonGreen,
             child: TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("OK", style: TextStyle(color: Color(0xFF39FF14), fontWeight: FontWeight.w900, fontFamily: 'Courier')),
+              child: Text("OK", style: TextStyle(color: AppTheme.bgDeep, fontWeight: FontWeight.w900, fontFamily: 'ShareTechMono')),
             ),
           ),
         ],

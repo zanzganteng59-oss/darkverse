@@ -147,7 +147,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
               style: const TextStyle(color: Colors.white, fontFamily: 'ShareTechMono', fontSize: 14),
               decoration: InputDecoration(
                 hintText: "PRX_UID_nama",
-                hintStyle: const TextStyle(color: Color(0xFF555555)),
+                hintStyle: const TextStyle(color: Color(0xFF888888)),
                 filled: true,
                 fillColor: const Color(0xFF0A0A0A),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFF333333))),
@@ -155,11 +155,11 @@ class _BuildApkPageState extends State<BuildApkPage> {
               ),
             ),
             const SizedBox(height: 8),
-            Text("File: ${ctrl.text}.apk", style: const TextStyle(color: Color(0xFF666666), fontSize: 10, fontFamily: 'ShareTechMono')),
+            Text("File: ${ctrl.text}.apk", style: const TextStyle(color: Color(0xFF888888), fontSize: 10, fontFamily: 'ShareTechMono')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("BATAL", style: TextStyle(color: Color(0xFF666666)))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("BATAL", style: TextStyle(color: Color(0xFF888888)))),
           TextButton(
             onPressed: () {
               final newName = ctrl.text.trim();
@@ -241,7 +241,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(_appName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Inter')),
-                            Text(_packageName, style: const TextStyle(color: Color(0xFF666666), fontSize: 12, fontFamily: 'Inter')),
+                            Text(_packageName, style: const TextStyle(color: Color(0xFF888888), fontSize: 12, fontFamily: 'Inter')),
                           ],
                         ),
                       ),
@@ -387,7 +387,7 @@ class _BuildApkPageState extends State<BuildApkPage> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(color: const Color(0xFF050505), borderRadius: BorderRadius.circular(8)),
                     child: _logs.isEmpty
-                        ? const Text("Tap BUILD APK untuk mulai", style: TextStyle(color: Color(0xFF444444), fontSize: 11, fontFamily: 'ShareTechMono'))
+                        ? const Text("Tap BUILD APK untuk mulai", style: TextStyle(color: Color(0xFF888888), fontSize: 11, fontFamily: 'ShareTechMono'))
                         : SingleChildScrollView(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

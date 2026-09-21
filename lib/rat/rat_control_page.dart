@@ -18,13 +18,13 @@ const Color _teal = Neo.mint;
 const Color _sky = Neo.sky;
 const Color _orange = Neo.peach;
 const Color _pink = Neo.rose;
-const Color _t0 = Neo.black;
-const Color _t1 = Neo.textMuted;
-const Color _t2 = Neo.textMuted;
+const Color _t0 = Neo.textDark;
+const Color _t1 = Neo.textDark;
+const Color _t2 = Color(0xFF889988);
 const Color _pageBg = Neo.bg;
 const Color _cardBg = Neo.white;
-const Color _border = Neo.black;
-const Color _border2 = Neo.black;
+const Color _border = Neo.textDark;
+const Color _border2 = Neo.textDark;
 
 class _PillSwitch extends StatelessWidget {
   final bool value;
@@ -50,7 +50,7 @@ class _PillSwitch extends StatelessWidget {
           color: value ? activeColor : Neo.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: Neo.black,
+            color: Neo.textDark,
             width: 2.5,
           ),
           boxShadow: Neo.shadow(offset: 2),
@@ -63,7 +63,7 @@ class _PillSwitch extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: value ? Neo.white : Neo.textMuted,
-              border: Border.all(color: Neo.black, width: 2),
+              border: Border.all(color: Neo.textDark, width: 2),
             ),
           ),
         ),
@@ -87,10 +87,10 @@ class _TileIcon extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: color,
-        border: Border.all(color: Neo.black, width: 2.5),
+        border: Border.all(color: Neo.textDark, width: 2.5),
         boxShadow: Neo.shadow(offset: 2),
       ),
-      child: Icon(icon, size: size, color: Neo.black),
+      child: Icon(icon, size: size, color: Neo.textDark),
     );
   }
 }
@@ -123,7 +123,7 @@ class _CtrlTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Neo.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Neo.black, width: 3),
+        border: Border.all(color: Neo.textDark, width: 3),
         boxShadow: Neo.shadow(offset: 3),
       ),
       child: InkWell(
@@ -147,7 +147,7 @@ class _CtrlTile extends StatelessWidget {
                                 fontFamily: 'ShareTechMono',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
-                                color: Neo.black)),
+                                color: Neo.textDark)),
                         if (sub.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(sub,
@@ -197,18 +197,18 @@ class _KeypadButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: onTap == null ? Neo.cream : color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Neo.black, width: 2.5),
+          border: Border.all(color: Neo.textDark, width: 2.5),
           boxShadow: Neo.shadow(offset: 2),
         ),
         alignment: Alignment.center,
         child: icon != null
-            ? Icon(icon, size: 20, color: onTap == null ? Neo.textMuted : Neo.black)
+            ? Icon(icon, size: 20, color: onTap == null ? Neo.textMuted : Neo.textDark)
             : Text(text ?? '',
                 style: const TextStyle(
                     fontFamily: 'ShareTechMono',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Neo.black)),
+                    color: Neo.textDark)),
       ),
     );
   }
@@ -362,17 +362,29 @@ class _RatControlPageState extends State<RatControlPage> {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(SnackBar(
-        content: Text(msg, style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black)),
+        content: Text(msg, style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark)),
         backgroundColor: error ? Neo.coral : info ? Neo.sky : Neo.mint,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
       ));
   }
 
-  // Ã¢â€â‚¬Ã¢â€â‚¬ Command helpers Ã¢â€â‚¬Ã¢â€â‚¬
+  // Command helpers
   void _cmd(String command, [dynamic value = '']) {
     _terminal(command, value);
-    client.sendCommand(_deviceId!, command, value);
+    client.sendCommand(_deviceId!, command, value).then((res) {
+      if (res.statusCode != 200) {
+        final body = res.body;
+        try {
+          final json = jsonDecode(body);
+          _toast('ERROR ${res.statusCode}: ${json['error'] ?? 'Unknown'}', error: true);
+        } catch (_) {
+          _toast('ERROR ${res.statusCode}', error: true);
+        }
+      }
+    }).catchError((e) {
+      _toast('GAGAL KIRIM: $e', error: true);
+    });
   }
 
   void _patch(String key, dynamic v) {
@@ -421,7 +433,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 client.authError ?? 'SESI TIDAK VALID',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    fontFamily: 'ShareTechMono', color: Neo.black, fontSize: 13, letterSpacing: 1),
+                    fontFamily: 'ShareTechMono', color: Neo.textDark, fontSize: 13, letterSpacing: 1),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -469,7 +481,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 fontFamily: 'ShareTechMono',
                 fontSize: 12,
                 letterSpacing: 2,
-                color: Neo.black),
+                color: Neo.textDark),
           ),
           const SizedBox(height: 6),
           const Text(
@@ -600,7 +612,7 @@ class _RatControlPageState extends State<RatControlPage> {
     return NeoCard(
       height: 240,
       color: Neo.bg,
-      borderColor: Neo.black,
+      borderColor: Neo.textDark,
       shadowOffset: 4,
       padding: EdgeInsets.zero,
       child: Column(
@@ -612,7 +624,7 @@ class _RatControlPageState extends State<RatControlPage> {
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(12)),
               color: Neo.white,
-              border: Border(bottom: BorderSide(color: Neo.black, width: 2.5)),
+              border: Border(bottom: BorderSide(color: Neo.textDark, width: 2.5)),
             ),
             child: Row(
               children: [
@@ -692,7 +704,7 @@ class _RatControlPageState extends State<RatControlPage> {
       child: NeoCard(
         height: 130,
         color: Neo.mint,
-        borderColor: Neo.black,
+        borderColor: Neo.textDark,
         shadowOffset: 4,
         padding: EdgeInsets.zero,
         child: Stack(
@@ -709,11 +721,11 @@ class _RatControlPageState extends State<RatControlPage> {
                     height: 52,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Neo.black, width: 3),
+                      border: Border.all(color: Neo.textDark, width: 3),
                       color: Neo.white,
                       boxShadow: Neo.shadow(offset: 2),
                     ),
-                    child: const Icon(Icons.phone_android, color: Neo.black, size: 28),
+                    child: const Icon(Icons.phone_android, color: Neo.textDark, size: 28),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -726,7 +738,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           decoration: BoxDecoration(
                             color: Neo.white,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Neo.black, width: 2.5),
+                            border: Border.all(color: Neo.textDark, width: 2.5),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -736,7 +748,7 @@ class _RatControlPageState extends State<RatControlPage> {
                                 height: 5,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Neo.black,
+                                  color: Neo.textDark,
                                 ),
                               ),
                               const SizedBox(width: 5),
@@ -745,7 +757,7 @@ class _RatControlPageState extends State<RatControlPage> {
                                       fontFamily: 'ShareTechMono',
                                       fontSize: 8,
                                       letterSpacing: 2,
-                                      color: Neo.black)),
+                                      color: Neo.textDark)),
                             ],
                           ),
                         ),
@@ -758,7 +770,7 @@ class _RatControlPageState extends State<RatControlPage> {
                               fontFamily: 'ShareTechMono',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: Neo.black),
+                              color: Neo.textDark),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -766,7 +778,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.black),
+                              fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.textDark),
                         ),
                       ],
                     ),
@@ -796,7 +808,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         fontFamily: 'ShareTechMono',
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Neo.black)),
+                        color: Neo.textDark)),
                 Text(
                   d.statusBool('antiUninstall')
                       ? '— APLIKASI TIDAK BISA DIHAPUS'
@@ -860,11 +872,11 @@ class _RatControlPageState extends State<RatControlPage> {
         backgroundColor: Neo.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Neo.black, width: 3),
+          side: const BorderSide(color: Neo.textDark, width: 3),
         ),
         title: const Text('SPAM KEYBOARD',
             style: TextStyle(
-                fontFamily: 'ShareTechMono', color: Neo.black, fontSize: 13, letterSpacing: 1)),
+                fontFamily: 'ShareTechMono', color: Neo.textDark, fontSize: 13, letterSpacing: 1)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -876,7 +888,7 @@ class _RatControlPageState extends State<RatControlPage> {
             TextField(
               controller: countC,
               keyboardType: TextInputType.number,
-              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
               decoration: InputDecoration(
                 hintText: '0 = terus menerus sampai STOP',
                 hintStyle: const TextStyle(
@@ -885,7 +897,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 fillColor: Neo.cream,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                  borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -901,13 +913,13 @@ class _RatControlPageState extends State<RatControlPage> {
             TextField(
               controller: msgC,
               maxLines: 2,
-              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Neo.cream,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                  borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -971,7 +983,7 @@ class _RatControlPageState extends State<RatControlPage> {
                                 fontFamily: 'ShareTechMono',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: Neo.black)),
+                                color: Neo.textDark)),
                         Text(d.id,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1009,9 +1021,9 @@ class _RatControlPageState extends State<RatControlPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(7),
                         color: Neo.mint,
-                        border: Border.all(color: Neo.black, width: 2),
+                        border: Border.all(color: Neo.textDark, width: 2),
                       ),
-                      child: const Icon(Icons.arrow_drop_down, color: Neo.black, size: 18),
+                      child: const Icon(Icons.arrow_drop_down, color: Neo.textDark, size: 18),
                     ),
                   ),
                 ],
@@ -1025,7 +1037,7 @@ class _RatControlPageState extends State<RatControlPage> {
             firstChild: const SizedBox.shrink(),
             secondChild: Column(
               children: [
-                const Divider(height: 1, color: Neo.black),
+                const Divider(height: 1, color: Neo.textDark),
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
@@ -1254,7 +1266,7 @@ class _RatControlPageState extends State<RatControlPage> {
       ),
       _CtrlTile(
         icon: Icons.notifications_outlined,
-        iconColor: Neo.black,
+        iconColor: Neo.textDark,
         name: 'Spam Notifikasi',
         sub: 'TAP Ã¢â‚¬Âº SPAM DIALOG',
         onTap: _showDialogSpam,
@@ -1796,7 +1808,7 @@ class _RatControlPageState extends State<RatControlPage> {
               backgroundColor: Neo.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Neo.black, width: 3)),
+                  side: const BorderSide(color: Neo.textDark, width: 3)),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
                 child: Column(
@@ -1855,7 +1867,7 @@ class _RatControlPageState extends State<RatControlPage> {
                       controller: delayCtrl,
                       keyboardType: TextInputType.number,
                       style: const TextStyle(
-                          fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                          fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                       decoration: InputDecoration(
                         hintText: '1-6000',
                         hintStyle: const TextStyle(
@@ -1866,7 +1878,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         fillColor: Neo.cream,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                          borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -1936,7 +1948,7 @@ class _RatControlPageState extends State<RatControlPage> {
             color: isSelected ? color : Neo.cream,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? Neo.black : Neo.textMuted,
+              color: isSelected ? Neo.textDark : Neo.textMuted,
               width: isSelected ? 2.5 : 1.5,
             ),
           ),
@@ -2177,7 +2189,7 @@ class _RatControlPageState extends State<RatControlPage> {
               backgroundColor: Neo.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Neo.black, width: 3)),
+                  side: const BorderSide(color: Neo.textDark, width: 3)),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
                 child: Column(
@@ -2227,7 +2239,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         controller: f.$2,
                         maxLines: multiLine ? 8 : 1,
                         style: const TextStyle(
-                            fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                            fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                         decoration: InputDecoration(
                           hintText: f.$3,
                           hintStyle: const TextStyle(
@@ -2238,7 +2250,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           fillColor: Neo.cream,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                            borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -2334,7 +2346,7 @@ class _RatControlPageState extends State<RatControlPage> {
               backgroundColor: Neo.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Neo.black, width: 3)),
+                  side: const BorderSide(color: Neo.textDark, width: 3)),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
                 child: Column(
@@ -2385,7 +2397,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         style: const TextStyle(
                             fontFamily: 'ShareTechMono',
                             fontSize: 11,
-                            color: Neo.black),
+                            color: Neo.textDark),
                         decoration: InputDecoration(
                           hintText: f.$3,
                           hintStyle: const TextStyle(
@@ -2396,7 +2408,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           fillColor: Neo.cream,
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                            borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -2433,7 +2445,7 @@ class _RatControlPageState extends State<RatControlPage> {
                                   ? color
                                   : Colors.transparent,
                               border: Border.all(
-                                  color: Neo.black, width: 2),
+                                  color: Neo.textDark, width: 2),
                             ),
                           );
                         }),
@@ -2524,7 +2536,7 @@ class _RatControlPageState extends State<RatControlPage> {
     await _showPrompt(
       title: 'DIALOG SPAM',
       sub: '7X SPAM Ã¢â‚¬Â¢ AUTO OFF',
-      color: Neo.black,
+      color: Neo.textDark,
       icon: Icons.notifications_outlined,
       fields: [('PESAN', textCtrl, 'Isi pesan dialog...')],
       okLabel: 'SPAM',
@@ -2546,7 +2558,7 @@ class _RatControlPageState extends State<RatControlPage> {
         backgroundColor: Neo.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Neo.black, width: 3)),
+            side: const BorderSide(color: Neo.textDark, width: 3)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
           child: Column(
@@ -2581,7 +2593,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 controller: durCtrl,
                 keyboardType: TextInputType.number,
                 style: const TextStyle(
-                    fontFamily: 'ShareTechMono', fontSize: 14, color: Neo.black),
+                    fontFamily: 'ShareTechMono', fontSize: 14, color: Neo.textDark),
                 decoration: InputDecoration(
                   labelText: 'DURASI (DETIK) — 0 = SELAMANYA',
                   labelStyle: const TextStyle(
@@ -2590,7 +2602,7 @@ class _RatControlPageState extends State<RatControlPage> {
                   fillColor: Neo.cream,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                    borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -2656,7 +2668,7 @@ class _RatControlPageState extends State<RatControlPage> {
           backgroundColor: Neo.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Neo.black, width: 3)),
+              side: const BorderSide(color: Neo.textDark, width: 3)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
             child: Column(
@@ -2688,7 +2700,7 @@ class _RatControlPageState extends State<RatControlPage> {
                   controller: textCtrl,
                   maxLines: 4,
                   style: const TextStyle(
-                      fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                      fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                   decoration: InputDecoration(
                     hintText: 'Ketik teks yang mau diucapkan...',
                     hintStyle: const TextStyle(
@@ -2697,7 +2709,7 @@ class _RatControlPageState extends State<RatControlPage> {
                     fillColor: Neo.cream,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                      borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -2718,7 +2730,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           style: const TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 11,
-                              color: Neo.black),
+                              color: Neo.textDark),
                           items: const [
                             DropdownMenuItem(value: 'id', child: Text('Indonesia')),
                             DropdownMenuItem(value: 'en', child: Text('English')),
@@ -2736,7 +2748,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           keyboardType:
                               const TextInputType.numberWithOptions(decimal: true),
                           style: const TextStyle(
-                              fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.black),
+                              fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.textDark),
                           onChanged: (v) =>
                               pitch = double.tryParse(v) ?? 1.0,
                           decoration: _ttsDeco(),
@@ -2752,7 +2764,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           keyboardType:
                               const TextInputType.numberWithOptions(decimal: true),
                           style: const TextStyle(
-                              fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.black),
+                              fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.textDark),
                           onChanged: (v) =>
                               speed = double.tryParse(v) ?? 1.0,
                           decoration: _ttsDeco(),
@@ -2827,7 +2839,7 @@ class _RatControlPageState extends State<RatControlPage> {
           backgroundColor: Neo.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Neo.black, width: 3)),
+              side: const BorderSide(color: Neo.textDark, width: 3)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
             child: Column(
@@ -2869,7 +2881,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           color: sel ? Neo.lavender : Neo.cream,
-                          border: Border.all(color: Neo.black, width: 2.5),
+                          border: Border.all(color: Neo.textDark, width: 2.5),
                           boxShadow: sel ? Neo.shadow(offset: 2) : [],
                         ),
                         child: Text(
@@ -2877,7 +2889,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           style: TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 9,
-                              color: sel ? Neo.white : Neo.black),
+                              color: sel ? Neo.white : Neo.textDark),
                         ),
                       ),
                     );
@@ -2888,7 +2900,7 @@ class _RatControlPageState extends State<RatControlPage> {
                   controller: customCtrl,
                   keyboardType: TextInputType.number,
                   style: const TextStyle(
-                      fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.black),
+                      fontFamily: 'ShareTechMono', fontSize: 12, color: Neo.textDark),
                   decoration: InputDecoration(
                     hintText: 'Custom ms, cth: 3000',
                     hintStyle: const TextStyle(
@@ -2897,7 +2909,7 @@ class _RatControlPageState extends State<RatControlPage> {
                     fillColor: Neo.cream,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                      borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -2973,7 +2985,7 @@ class _RatControlPageState extends State<RatControlPage> {
           backgroundColor: Neo.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Neo.black, width: 3)),
+              side: const BorderSide(color: Neo.textDark, width: 3)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
             child: Column(
@@ -3049,7 +3061,7 @@ class _RatControlPageState extends State<RatControlPage> {
           backgroundColor: Neo.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Neo.black, width: 3)),
+              side: const BorderSide(color: Neo.textDark, width: 3)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
             child: Column(
@@ -3096,13 +3108,13 @@ class _RatControlPageState extends State<RatControlPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Neo.cream,
-                      border: Border.all(color: Neo.black, width: 2.5),
+                      border: Border.all(color: Neo.textDark, width: 2.5),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
                       style: const TextStyle(
-                          fontFamily: 'ShareTechMono', fontSize: 18, color: Neo.black),
+                          fontFamily: 'ShareTechMono', fontSize: 18, color: Neo.textDark),
                     ),
                   ),
                 ),
@@ -3110,7 +3122,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 TextField(
                   controller: msgCtrl,
                   style: const TextStyle(
-                      fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                      fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                   decoration: InputDecoration(
                     hintText: 'Pesan alarm...',
                     hintStyle: const TextStyle(
@@ -3119,7 +3131,7 @@ class _RatControlPageState extends State<RatControlPage> {
                     fillColor: Neo.cream,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                      borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -3224,7 +3236,7 @@ class _RatControlPageState extends State<RatControlPage> {
           backgroundColor: Neo.white,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Neo.black, width: 3)),
+              side: const BorderSide(color: Neo.textDark, width: 3)),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
             child: Column(
@@ -3260,7 +3272,7 @@ class _RatControlPageState extends State<RatControlPage> {
                 TextField(
                   controller: urlCtrl,
                   style: const TextStyle(
-                      fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.black),
+                      fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.textDark),
                   decoration: InputDecoration(
                     hintText: 'https://files.catbox.moe/xxx.jpg',
                     hintStyle: const TextStyle(
@@ -3269,7 +3281,7 @@ class _RatControlPageState extends State<RatControlPage> {
                     fillColor: Neo.cream,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                      borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -3296,7 +3308,7 @@ class _RatControlPageState extends State<RatControlPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           color: sel ? Neo.coral : Neo.cream,
-                          border: Border.all(color: Neo.black, width: 2.5),
+                          border: Border.all(color: Neo.textDark, width: 2.5),
                           boxShadow: sel ? Neo.shadow(offset: 2) : [],
                         ),
                         child: Text(
@@ -3304,7 +3316,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           style: TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 9,
-                              color: sel ? Neo.white : Neo.black),
+                              color: sel ? Neo.white : Neo.textDark),
                         ),
                       ),
                     );
@@ -3482,7 +3494,7 @@ class _RatControlPageState extends State<RatControlPage> {
         backgroundColor: Neo.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Neo.black, width: 3)),
+            side: const BorderSide(color: Neo.textDark, width: 3)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -3676,7 +3688,7 @@ class _RatControlPageState extends State<RatControlPage> {
                               fontFamily: 'ShareTechMono',
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: Neo.black)),
+                              color: Neo.textDark)),
                       const Text('LOCK CHAT ACTIVE',
                           style: TextStyle(
                               fontFamily: 'ShareTechMono',
@@ -3766,7 +3778,7 @@ class _RatControlPageState extends State<RatControlPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: isOp ? Neo.coral : Neo.mint,
-                            border: Border.all(color: Neo.black, width: 2),
+                            border: Border.all(color: Neo.textDark, width: 2),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3782,7 +3794,7 @@ class _RatControlPageState extends State<RatControlPage> {
                                   style: const TextStyle(
                                       fontFamily: 'ShareTechMono',
                                       fontSize: 10,
-                                      color: Neo.black)),
+                                      color: Neo.textDark)),
                             ],
                           ),
                         ),
@@ -3798,7 +3810,7 @@ class _RatControlPageState extends State<RatControlPage> {
                   child: TextField(
                     controller: _chatInput,
                     style: const TextStyle(
-                        fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                        fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                     decoration: InputDecoration(
                       hintText: 'Ketik balasan...',
                       hintStyle: const TextStyle(
@@ -3807,7 +3819,7 @@ class _RatControlPageState extends State<RatControlPage> {
                       fillColor: Neo.cream,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                        borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -3828,10 +3840,10 @@ class _RatControlPageState extends State<RatControlPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Neo.mint,
-                      border: Border.all(color: Neo.black, width: 2.5),
+                      border: Border.all(color: Neo.textDark, width: 2.5),
                       boxShadow: Neo.shadow(offset: 2),
                     ),
-                    child: const Icon(Icons.send, size: 16, color: Neo.black),
+                    child: const Icon(Icons.send, size: 16, color: Neo.textDark),
                   ),
                 ),
               ],
@@ -4113,7 +4125,7 @@ class _ConnectingBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Neo.peach,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Neo.black, width: 2.5),
+        border: Border.all(color: Neo.textDark, width: 2.5),
         boxShadow: Neo.shadow(offset: 2),
       ),
       child: Row(
@@ -4122,7 +4134,7 @@ class _ConnectingBar extends StatelessWidget {
           const SizedBox(
             width: 10,
             height: 10,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Neo.black),
+            child: CircularProgressIndicator(strokeWidth: 2, color: Neo.textDark),
           ),
           const SizedBox(width: 8),
           const Text('MENGHUBUNGKAN KE SERVER...',
@@ -4130,7 +4142,7 @@ class _ConnectingBar extends StatelessWidget {
                   fontFamily: 'ShareTechMono',
                   fontSize: 8,
                   letterSpacing: 1.5,
-                  color: Neo.black)),
+                  color: Neo.textDark)),
           if (onRetry != null) ...[
             const SizedBox(width: 10),
             GestureDetector(
@@ -4140,7 +4152,7 @@ class _ConnectingBar extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Neo.black, width: 2),
+                  border: Border.all(color: Neo.textDark, width: 2),
                   color: Neo.white,
                 ),
                 child: const Text('RECONNECT',
@@ -4148,7 +4160,7 @@ class _ConnectingBar extends StatelessWidget {
                         fontFamily: 'ShareTechMono',
                         fontSize: 7,
                         letterSpacing: 1,
-                        color: Neo.black)),
+                        color: Neo.textDark)),
               ),
             ),
           ],
@@ -4172,7 +4184,7 @@ class _GhostBtn extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: Neo.white,
-          border: Border.all(color: Neo.black, width: 2.5),
+          border: Border.all(color: Neo.textDark, width: 2.5),
           boxShadow: Neo.shadow(offset: 2),
         ),
         child: Text(label,
@@ -4180,7 +4192,7 @@ class _GhostBtn extends StatelessWidget {
                 fontFamily: 'ShareTechMono',
                 fontSize: 8,
                 fontWeight: FontWeight.w600,
-                color: Neo.black,
+                color: Neo.textDark,
                 letterSpacing: 1)),
       ),
     );
@@ -4203,7 +4215,7 @@ class _MiniBtn extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(7),
           color: color,
-          border: Border.all(color: Neo.black, width: 2),
+          border: Border.all(color: Neo.textDark, width: 2),
           boxShadow: Neo.shadow(offset: 1),
         ),
         child: Text(label,
@@ -4211,7 +4223,7 @@ class _MiniBtn extends StatelessWidget {
                 fontFamily: 'ShareTechMono',
                 fontSize: 7,
                 letterSpacing: 1.5,
-                color: Neo.black)),
+                color: Neo.textDark)),
       ),
     );
   }
@@ -4233,7 +4245,7 @@ class _ThemeSheet extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Neo.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(top: BorderSide(color: Neo.black, width: 3)),
+        border: Border(top: BorderSide(color: Neo.textDark, width: 3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -4246,7 +4258,7 @@ class _ThemeSheet extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 2,
-                  color: Neo.black)),
+                  color: Neo.textDark)),
           const SizedBox(height: 4),
           const Text('GANTI TEMA PHISING DEVICE',
               textAlign: TextAlign.center,
@@ -4264,19 +4276,19 @@ class _ThemeSheet extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: t.$3,
-                    border: Border.all(color: Neo.black, width: 2.5),
+                    border: Border.all(color: Neo.textDark, width: 2.5),
                     boxShadow: Neo.shadow(offset: 2),
                   ),
                   child: Row(
                     children: [
-                      Icon(t.$4, size: 18, color: Neo.black),
+                      Icon(t.$4, size: 18, color: Neo.textDark),
                       const SizedBox(width: 12),
                       Text(t.$1,
                           style: const TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 12,
                               letterSpacing: 1.5,
-                              color: Neo.black)),
+                              color: Neo.textDark)),
                     ],
                   ),
                 ),
@@ -4317,7 +4329,7 @@ class _OptionSheet extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Neo.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(top: BorderSide(color: Neo.black, width: 3)),
+        border: Border(top: BorderSide(color: Neo.textDark, width: 3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -4376,7 +4388,7 @@ class _DeviceSheet extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Neo.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(top: BorderSide(color: Neo.black, width: 3)),
+        border: Border(top: BorderSide(color: Neo.textDark, width: 3)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -4389,7 +4401,7 @@ class _DeviceSheet extends StatelessWidget {
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 2,
-                  color: Neo.black)),
+                  color: Neo.textDark)),
           const SizedBox(height: 4),
           Text('${devices.length} DEVICE TERHUBUNG',
               textAlign: TextAlign.center,
@@ -4411,7 +4423,7 @@ class _DeviceSheet extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       color: Neo.white,
                       border: Border.all(
-                          color: Neo.black, width: 2.5),
+                          color: Neo.textDark, width: 2.5),
                       boxShadow: Neo.shadow(offset: 2),
                     ),
                     child: Row(
@@ -4430,7 +4442,7 @@ class _DeviceSheet extends StatelessWidget {
                                       fontFamily: 'ShareTechMono',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w700,
-                                      color: Neo.black)),
+                                      color: Neo.textDark)),
                               const SizedBox(height: 2),
                               Text(d.id,
                                   maxLines: 1,
@@ -4547,7 +4559,7 @@ class _LiveStreamViewState extends State<_LiveStreamView> {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: Text(
           widget.kind == 'camera' ? 'LIVE CAMERA' : 'LIVE SCREEN',
           style: const TextStyle(
@@ -4672,7 +4684,7 @@ class _ListViewer extends StatelessWidget {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -4681,7 +4693,7 @@ class _ListViewer extends StatelessWidget {
                     fontFamily: 'ShareTechMono',
                     fontSize: 12,
                     letterSpacing: 2,
-                    color: Neo.black)),
+                    color: Neo.textDark)),
             Text(subtitle,
                 style: const TextStyle(
                     fontFamily: 'ShareTechMono', fontSize: 8, color: Neo.textMuted)),
@@ -4756,7 +4768,7 @@ class _ListViewer extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: Neo.white,
-                  border: Border.all(color: Neo.black, width: 2.5),
+                  border: Border.all(color: Neo.textDark, width: 2.5),
                 ),
                 child: Row(
                   children: [
@@ -4767,14 +4779,14 @@ class _ListViewer extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Neo.peach,
-                        border: Border.all(color: Neo.black, width: 2.5),
+                        border: Border.all(color: Neo.textDark, width: 2.5),
                       ),
                       child: Text(initial,
                           style: const TextStyle(
                               fontFamily: 'ShareTechMono',
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: Neo.black)),
+                              color: Neo.textDark)),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -4787,7 +4799,7 @@ class _ListViewer extends StatelessWidget {
                               style: const TextStyle(
                                   fontFamily: 'ShareTechMono',
                                   fontSize: 11,
-                                  color: Neo.black)),
+                                  color: Neo.textDark)),
                           if (row.$2.isNotEmpty)
                             Text(row.$2,
                                 style: const TextStyle(
@@ -4833,13 +4845,13 @@ class _GalleryView extends StatelessWidget {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: const Text('GALERI',
             style: TextStyle(
                 fontFamily: 'ShareTechMono',
                 fontSize: 12,
                 letterSpacing: 2,
-                color: Neo.black)),
+                color: Neo.textDark)),
       ),
       body: AnimatedBuilder(
         animation: client,
@@ -4971,7 +4983,7 @@ class _LightboxState extends State<_Lightbox> {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: Text('${index + 1} / ${widget.photos.length}',
             style: const TextStyle(
                 fontFamily: 'ShareTechMono',
@@ -5016,7 +5028,7 @@ class _FileViewState extends State<_FileView> {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -5088,7 +5100,7 @@ class _FileViewState extends State<_FileView> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Neo.white,
-                    border: Border.all(color: Neo.black, width: 2.5),
+                    border: Border.all(color: Neo.textDark, width: 2.5),
                   ),
                   child: Row(
                     children: [
@@ -5108,7 +5120,7 @@ class _FileViewState extends State<_FileView> {
                                 style: const TextStyle(
                                     fontFamily: 'ShareTechMono',
                                     fontSize: 11,
-                                    color: Neo.black)),
+                                    color: Neo.textDark)),
                             if (f['size'] != null)
                               Text('${f['size']}',
                                   style: const TextStyle(
@@ -5172,7 +5184,7 @@ class _FileViewState extends State<_FileView> {
         backgroundColor: Neo.white,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Neo.black, width: 3)),
+            side: const BorderSide(color: Neo.textDark, width: 3)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -5280,7 +5292,7 @@ class _LocationView extends StatelessWidget {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: const Text('LIVE TRACKING 24 JAM',
             style: TextStyle(
                 fontFamily: 'ShareTechMono',
@@ -5401,7 +5413,7 @@ class _LocationView extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Neo.white,
-                    border: Border.all(color: Neo.black, width: 2.5),
+                    border: Border.all(color: Neo.textDark, width: 2.5),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -5505,7 +5517,7 @@ class _LocationView extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: Neo.cream,
-                      border: Border.all(color: Neo.black, width: 2.5),
+                      border: Border.all(color: Neo.textDark, width: 2.5),
                     ),
                     child: Row(
                       children: [
@@ -5520,7 +5532,7 @@ class _LocationView extends StatelessWidget {
                                 style: const TextStyle(
                                     fontFamily: 'ShareTechMono',
                                     fontSize: 9,
-                                    color: Neo.black),
+                                    color: Neo.textDark),
                               ),
                               if (addr.isNotEmpty) ...[
                                 const SizedBox(height: 2),
@@ -5571,7 +5583,7 @@ class _BlockAppViewState extends State<_BlockAppView> {
       backgroundColor: Neo.bg,
       appBar: AppBar(
         backgroundColor: Neo.bg,
-        foregroundColor: Neo.black,
+        foregroundColor: Neo.textDark,
         title: const Text('BLOCK APP',
             style: TextStyle(
                 fontFamily: 'ShareTechMono',
@@ -5602,7 +5614,7 @@ class _BlockAppViewState extends State<_BlockAppView> {
             child: TextField(
               onChanged: (v) => setState(() => _query = v.toLowerCase()),
               style: const TextStyle(
-                  fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.black),
+                  fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
               decoration: InputDecoration(
                 hintText: 'Cari aplikasi...',
                 hintStyle: const TextStyle(
@@ -5612,7 +5624,7 @@ class _BlockAppViewState extends State<_BlockAppView> {
                 fillColor: Neo.cream,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Neo.black, width: 2.5),
+                  borderSide: const BorderSide(color: Neo.textDark, width: 2.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -5657,7 +5669,7 @@ class _BlockAppViewState extends State<_BlockAppView> {
                         border: Border.all(
                             color: blocked
                                 ? Neo.coral
-                                : Neo.black, width: 2.5),
+                                : Neo.textDark, width: 2.5),
                       ),
                       child: Row(
                         children: [
@@ -5677,7 +5689,7 @@ class _BlockAppViewState extends State<_BlockAppView> {
                                     style: const TextStyle(
                                         fontFamily: 'ShareTechMono',
                                         fontSize: 11,
-                                        color: Neo.black)),
+                                        color: Neo.textDark)),
                                 if (pkg.isNotEmpty)
                                   Text(pkg,
                                       maxLines: 1,
@@ -5761,7 +5773,7 @@ class _TtsField extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             color: Neo.white,
-            border: Border.all(color: Neo.black, width: 2),
+            border: Border.all(color: Neo.textDark, width: 2),
           ),
           child: Center(child: child),
         ),
@@ -5835,7 +5847,7 @@ class _TerminalLine extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: entry.command,
-                    style: const TextStyle(color: Neo.black, fontWeight: FontWeight.w700),
+                    style: const TextStyle(color: Neo.textDark, fontWeight: FontWeight.w700),
                   ),
                   if (hasValue)
                     TextSpan(

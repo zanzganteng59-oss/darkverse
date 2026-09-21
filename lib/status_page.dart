@@ -161,9 +161,9 @@ class _StatusPageState extends State<StatusPage> {
                       : const Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_photo_alternate_rounded, color: Color(0xFF555555), size: 36),
+                            Icon(Icons.add_photo_alternate_rounded, color: Color(0xFF888888), size: 36),
                             SizedBox(height: 8),
-                            Text("Tap untuk pilih foto (opsional)", style: TextStyle(color: Color(0xFF555555), fontSize: 12, fontFamily: 'Inter')),
+                            Text("Tap untuk pilih foto (opsional)", style: TextStyle(color: Color(0xFF888888), fontSize: 12, fontFamily: 'Inter')),
                           ],
                         ),
                 ),
@@ -387,7 +387,7 @@ class _StatusPageState extends State<StatusPage> {
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
-                                    Text(statuses.length.toString() + " status", style: const TextStyle(color: Color(0xFF666666), fontSize: 9, fontFamily: 'Inter')),
+                                    Text(statuses.length.toString() + " status", style: const TextStyle(color: Color(0xFF888888), fontSize: 9, fontFamily: 'Inter')),
                                   ],
                                 ),
                               ),
@@ -405,9 +405,9 @@ class _StatusPageState extends State<StatusPage> {
                                 children: [
                                   Icon(Icons.campaign_rounded, color: Colors.grey[700], size: 48),
                                   const SizedBox(height: 12),
-                                  const Text("Belum ada status", style: TextStyle(color: Color(0xFF555555), fontSize: 14, fontFamily: 'Inter')),
+                                  const Text("Belum ada status", style: TextStyle(color: Color(0xFF888888), fontSize: 14, fontFamily: 'Inter')),
                                   const SizedBox(height: 6),
-                                  const Text("Tap + untuk post status pertama kamu", style: TextStyle(color: Color(0xFF444444), fontSize: 12, fontFamily: 'Inter')),
+                                  const Text("Tap + untuk post status pertama kamu", style: TextStyle(color: Color(0xFF777777), fontSize: 12, fontFamily: 'Inter')),
                                 ],
                               ),
                             )
@@ -479,7 +479,7 @@ class _StatusPageState extends State<StatusPage> {
                                                 const SizedBox(height: 3),
                                                 Text(
                                                   count.toString() + (count > 1 ? ' status' : ' status') + ' \u00b7 ' + _timeAgo(latest['createdAt']),
-                                                  style: const TextStyle(color: Color(0xFF666666), fontSize: 12, fontFamily: 'Inter'),
+                                                  style: const TextStyle(color: Color(0xFF888888), fontSize: 12, fontFamily: 'Inter'),
                                                 ),
                                               ],
                                             ),
