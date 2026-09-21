@@ -59,9 +59,17 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
       duration: const Duration(seconds: 3),
     )..repeat();
 
-    _headerFade = CurvedAnimation(parent: _entranceCtrl, curve: const Interval(0.0, 0.6, curve: Curves.easeOut));
-    _headerSlide = Tween<Offset>(begin: const Offset(0, -0.08), end: Offset.zero)
-        .animate(CurvedAnimation(parent: _entranceCtrl, curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic)));
+    _headerFade = CurvedAnimation(
+      parent: _entranceCtrl,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+    );
+    _headerSlide =
+        Tween<Offset>(begin: const Offset(0, -0.08), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _entranceCtrl,
+            curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _fetchUsers();
   }
@@ -198,7 +206,8 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
           tween: Tween(begin: 0.85, end: 1.0),
           duration: const Duration(milliseconds: 260),
           curve: Curves.easeOutBack,
-          builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+          builder: (context, scale, child) =>
+              Transform.scale(scale: scale, child: child),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(22),
             child: BackdropFilter(
@@ -221,9 +230,17 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             gradient: AppTheme.accentGradient(AppTheme.teal),
                             borderRadius: BorderRadius.circular(11),
-                            boxShadow: AppTheme.softGlow(AppTheme.teal, blur: 16, opacity: 0.35),
+                            boxShadow: AppTheme.softGlow(
+                              AppTheme.teal,
+                              blur: 16,
+                              opacity: 0.35,
+                            ),
                           ),
-                          child: const Icon(Icons.info_outline_rounded, color: Colors.white, size: 18),
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                         const SizedBox(width: 13),
                         Expanded(
@@ -239,16 +256,19 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                     const SizedBox(height: 6),
                     Padding(
                       padding: const EdgeInsets.only(left: 49),
-                      child: Container(height: 2, width: 32, decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [AppTheme.teal, Colors.transparent]),
-                        borderRadius: BorderRadius.circular(2),
-                      )),
+                      child: Container(
+                        height: 2,
+                        width: 32,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppTheme.teal, Colors.transparent],
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      message,
-                      style: AppTheme.bodyL,
-                    ),
+                    Text(message, style: AppTheme.bodyL),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
@@ -257,7 +277,11 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                         decoration: BoxDecoration(
                           gradient: AppTheme.accentGradient(AppTheme.teal),
                           borderRadius: BorderRadius.circular(13),
-                          boxShadow: AppTheme.softGlow(AppTheme.teal, blur: 18, opacity: 0.25),
+                          boxShadow: AppTheme.softGlow(
+                            AppTheme.teal,
+                            blur: 18,
+                            opacity: 0.25,
+                          ),
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -315,7 +339,11 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
           ),
           prefixIcon: Container(
             margin: const EdgeInsets.only(left: 4, right: 4),
-            child: Icon(icon, color: AppTheme.teal.withValues(alpha: 0.7), size: 17),
+            child: Icon(
+              icon,
+              color: AppTheme.teal.withValues(alpha: 0.7),
+              size: 17,
+            ),
           ),
           filled: true,
           fillColor: Colors.transparent,
@@ -338,7 +366,11 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
           decoration: AppTheme.cardDecor().copyWith(
             color: AppTheme.bgSurface.withValues(alpha: 0.6),
             boxShadow: [
-              BoxShadow(color: AppTheme.teal.withValues(alpha: glow), blurRadius: 16, spreadRadius: 0.5),
+              BoxShadow(
+                color: AppTheme.teal.withValues(alpha: glow),
+                blurRadius: 16,
+                spreadRadius: 0.5,
+              ),
             ],
           ),
           child: Icon(icon, color: AppTheme.teal, size: 18),
@@ -506,7 +538,10 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
       curve: Curves.easeOutCubic,
       builder: (context, value, child) => Opacity(
         opacity: value,
-        child: Transform.translate(offset: Offset((1 - value) * 18, 0), child: child),
+        child: Transform.translate(
+          offset: Offset((1 - value) * 18, 0),
+          child: child,
+        ),
       ),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
@@ -522,14 +557,24 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
               height: 42,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [roleColor.withValues(alpha: 0.22), roleColor.withValues(alpha: 0.06)],
+                  colors: [
+                    roleColor.withValues(alpha: 0.22),
+                    roleColor.withValues(alpha: 0.06),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
-                border: Border.all(color: roleColor.withValues(alpha: 0.35), width: 1.2),
+                border: Border.all(
+                  color: roleColor.withValues(alpha: 0.35),
+                  width: 1.2,
+                ),
                 boxShadow: [
-                  BoxShadow(color: roleColor.withValues(alpha: 0.15), blurRadius: 10, spreadRadius: 0.5),
+                  BoxShadow(
+                    color: roleColor.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    spreadRadius: 0.5,
+                  ),
                 ],
               ),
               alignment: Alignment.center,
@@ -560,11 +605,16 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: roleColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: roleColor.withValues(alpha: 0.3)),
+                          border: Border.all(
+                            color: roleColor.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -572,7 +622,10 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                             Container(
                               width: 5,
                               height: 5,
-                              decoration: BoxDecoration(color: roleColor, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                color: roleColor,
+                                shape: BoxShape.circle,
+                              ),
                             ),
                             const SizedBox(width: 5),
                             Text(
@@ -588,22 +641,37 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(Icons.schedule_rounded, size: 11, color: AppTheme.textMuted.withValues(alpha: 0.7)),
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 11,
+                        color: AppTheme.textMuted.withValues(alpha: 0.7),
+                      ),
                       const SizedBox(width: 3),
                       Text(
                         "${user['expiredDate']}",
-                        style: const TextStyle(color: AppTheme.textMuted, fontSize: 11, letterSpacing: 0.2),
+                        style: const TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 11,
+                          letterSpacing: 0.2,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.account_tree_outlined, size: 11, color: AppTheme.textMuted.withValues(alpha: 0.4)),
+                      Icon(
+                        Icons.account_tree_outlined,
+                        size: 11,
+                        color: AppTheme.textMuted.withValues(alpha: 0.4),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         "${user['parent'] ?? 'SYSTEM'}",
-                        style: TextStyle(color: AppTheme.textMuted.withValues(alpha: 0.55), fontSize: 11),
+                        style: TextStyle(
+                          color: AppTheme.textMuted.withValues(alpha: 0.55),
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -614,10 +682,17 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
               decoration: BoxDecoration(
                 color: AppTheme.coral.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppTheme.coral.withValues(alpha: 0.3), width: 1),
+                border: Border.all(
+                  color: AppTheme.coral.withValues(alpha: 0.3),
+                  width: 1,
+                ),
               ),
               child: IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.coral, size: 18),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppTheme.coral,
+                  size: 18,
+                ),
                 onPressed: () async {
                   final confirm = await showDialog<bool>(
                     context: context,
@@ -633,7 +708,10 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                             decoration: AppTheme.cardDecor().copyWith(
                               color: AppTheme.bgCard.withValues(alpha: 0.94),
                               borderRadius: BorderRadius.circular(22),
-                              border: Border.all(color: AppTheme.coral.withValues(alpha: 0.32), width: 1.2),
+                              border: Border.all(
+                                color: AppTheme.coral.withValues(alpha: 0.32),
+                                width: 1.2,
+                              ),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -644,8 +722,14 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                                     Container(
                                       width: 36,
                                       height: 36,
-                                      decoration: AppTheme.accentCardDecor(AppTheme.coral),
-                                      child: const Icon(Icons.warning_amber_rounded, color: AppTheme.coral, size: 19),
+                                      decoration: AppTheme.accentCardDecor(
+                                        AppTheme.coral,
+                                      ),
+                                      child: const Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: AppTheme.coral,
+                                        size: 19,
+                                      ),
                                     ),
                                     const SizedBox(width: 13),
                                     const Text(
@@ -670,19 +754,28 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                                     Expanded(
                                       child: Container(
                                         height: 46,
-                                        decoration: AppTheme.inputDecor().copyWith(
-                                          color: AppTheme.bgSurface.withValues(alpha: 0.6),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
+                                        decoration: AppTheme.inputDecor()
+                                            .copyWith(
+                                              color: AppTheme.bgSurface
+                                                  .withValues(alpha: 0.6),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
                                         child: Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            borderRadius: BorderRadius.circular(12),
-                                            onTap: () => Navigator.pop(context, false),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            onTap: () =>
+                                                Navigator.pop(context, false),
                                             child: const Center(
                                               child: Text(
                                                 "Batal",
-                                                style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.w700),
+                                                style: TextStyle(
+                                                  color: AppTheme.textSecondary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
                                               ),
                                             ),
                                           ),
@@ -694,15 +787,26 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                                       child: Container(
                                         height: 46,
                                         decoration: BoxDecoration(
-                                          gradient: AppTheme.accentGradient(AppTheme.coral),
-                                          borderRadius: BorderRadius.circular(12),
-                                          boxShadow: AppTheme.softGlow(AppTheme.coral, blur: 14, opacity: 0.32),
+                                          gradient: AppTheme.accentGradient(
+                                            AppTheme.coral,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                          boxShadow: AppTheme.softGlow(
+                                            AppTheme.coral,
+                                            blur: 14,
+                                            opacity: 0.32,
+                                          ),
                                         ),
                                         child: Material(
                                           color: Colors.transparent,
                                           child: InkWell(
-                                            borderRadius: BorderRadius.circular(12),
-                                            onTap: () => Navigator.pop(context, true),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            onTap: () =>
+                                                Navigator.pop(context, true),
                                             child: const Center(
                                               child: Text(
                                                 "Hapus",
@@ -750,9 +854,7 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
           decoration: BoxDecoration(
-            gradient: isActive
-                ? AppTheme.accentGradient(AppTheme.teal)
-                : null,
+            gradient: isActive ? AppTheme.accentGradient(AppTheme.teal) : null,
             color: isActive ? null : AppTheme.bgSurface.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(9),
             border: Border.all(
@@ -769,7 +871,10 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
               onTap: () => setState(() => currentPage = page),
               borderRadius: BorderRadius.circular(9),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 child: Text(
                   "$page",
                   style: TextStyle(
@@ -799,7 +904,11 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
           value: value,
           dropdownColor: AppTheme.bgCard,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.teal, size: 20),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppTheme.teal,
+            size: 20,
+          ),
           style: AppTheme.bodyM.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w600,
@@ -868,7 +977,9 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        AppTheme.teal.withValues(alpha: 0.05 + _glowCtrl.value * 0.02),
+                        AppTheme.teal.withValues(
+                          alpha: 0.05 + _glowCtrl.value * 0.02,
+                        ),
                         Colors.transparent,
                       ],
                     ),
@@ -917,18 +1028,30 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                                 padding: const EdgeInsets.all(18),
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
-                                    colors: [AppTheme.teal.withValues(alpha: 0.12), AppTheme.sky.withValues(alpha: 0.05)],
+                                    colors: [
+                                      AppTheme.teal.withValues(alpha: 0.12),
+                                      AppTheme.sky.withValues(alpha: 0.05),
+                                    ],
                                   ),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: AppTheme.teal.withValues(alpha: 0.22), width: 1.2),
+                                  border: Border.all(
+                                    color: AppTheme.teal.withValues(
+                                      alpha: 0.22,
+                                    ),
+                                    width: 1.2,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.4),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.4,
+                                      ),
                                       blurRadius: 22,
                                       offset: const Offset(0, 10),
                                     ),
                                     BoxShadow(
-                                      color: AppTheme.teal.withValues(alpha: glow),
+                                      color: AppTheme.teal.withValues(
+                                        alpha: glow,
+                                      ),
                                       blurRadius: 34,
                                       spreadRadius: 4,
                                     ),
@@ -961,12 +1084,19 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 5,
+                            ),
                             decoration: AppTheme.accentCardDecor(AppTheme.teal),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.shield_outlined, size: 11, color: AppTheme.teal.withValues(alpha: 0.9)),
+                                Icon(
+                                  Icons.shield_outlined,
+                                  size: 11,
+                                  color: AppTheme.teal.withValues(alpha: 0.9),
+                                ),
                                 const SizedBox(width: 6),
                                 Text(
                                   "FULL ACCESS CONTROL",
@@ -1033,13 +1163,16 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                       _buildDropdown(
                         value: newUserRole,
                         items: roleOptions,
-                        onChanged: (val) => setState(() => newUserRole = val ?? 'member'),
+                        onChanged: (val) =>
+                            setState(() => newUserRole = val ?? 'member'),
                       ),
                       const SizedBox(height: 16),
                       _buildActionBtn(
                         onPressed: isLoading ? null : _createAccount,
                         text: isLoading ? "PROCESSING..." : "CREATE ACCOUNT",
-                        icon: isLoading ? Icons.hourglass_empty_outlined : Icons.add_circle_outline,
+                        icon: isLoading
+                            ? Icons.hourglass_empty_outlined
+                            : Icons.add_circle_outline,
                       ),
                     ],
                   ),
@@ -1065,7 +1198,11 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          _buildStatChip(Icons.people_alt_outlined, "${filteredList.length}", AppTheme.teal),
+                          _buildStatChip(
+                            Icons.people_alt_outlined,
+                            "${filteredList.length}",
+                            AppTheme.teal,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -1090,15 +1227,27 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                               children: [
                                 if (_getCurrentPageData().isEmpty)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 34),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 34,
+                                    ),
                                     alignment: Alignment.center,
                                     child: Column(
                                       children: [
-                                        Icon(Icons.inbox_outlined, color: AppTheme.textMuted.withValues(alpha: 0.5), size: 30),
+                                        Icon(
+                                          Icons.inbox_outlined,
+                                          color: AppTheme.textMuted.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                          size: 30,
+                                        ),
                                         const SizedBox(height: 10),
                                         Text(
                                           "Tidak ada user pada kategori ini",
-                                          style: TextStyle(color: AppTheme.textMuted.withValues(alpha: 0.7), fontSize: 12),
+                                          style: TextStyle(
+                                            color: AppTheme.textMuted
+                                                .withValues(alpha: 0.7),
+                                            fontSize: 12,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -1107,13 +1256,19 @@ class _AdminPageState extends State<AdminPage> with TickerProviderStateMixin {
                                   ..._getCurrentPageData()
                                       .asMap()
                                       .entries
-                                      .map((e) => _buildUserItem(e.value, e.key))
+                                      .map(
+                                        (e) => _buildUserItem(e.value, e.key),
+                                      )
                                       .toList(),
                                 const SizedBox(height: 24),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
                                   decoration: AppTheme.inputDecor().copyWith(
-                                    color: AppTheme.bgSurface.withValues(alpha: 0.3),
+                                    color: AppTheme.bgSurface.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                   child: Column(
                                     children: [
@@ -1197,5 +1352,6 @@ class _SubtleGridPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _SubtleGridPainter oldDelegate) => oldDelegate.pulse != pulse;
+  bool shouldRepaint(covariant _SubtleGridPainter oldDelegate) =>
+      oldDelegate.pulse != pulse;
 }

@@ -25,6 +25,8 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   String apiStatusText = "Checking...";
   Timer? _pingTimer;
 
+  List<Map<String, dynamic>> _announcements = [];
+
   late AnimationController _entranceController;
   late AnimationController _bounceController;
 
@@ -32,6 +34,7 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _fetchServerInfo();
+    _fetchAnnouncements();
     _startApiPingLoop();
 
     _entranceController = AnimationController(
@@ -69,6 +72,24 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
     } catch (e) {
       setState(() => isLoading = false);
     }
+  }
+
+  Future<void> _fetchAnnouncements() async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/api/announcements'),
+      ).timeout(const Duration(seconds: 10));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        if (data['announcements'] != null) {
+          setState(() {
+            _announcements = List<Map<String, dynamic>>.from(
+              (data['announcements'] as List).map((a) => Map<String, dynamic>.from(a)),
+            ).reversed.toList();
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   void _startApiPingLoop() {
@@ -276,10 +297,26 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                   children: [
                     _staggeredItem(index: 0, child: _buildApiStatusCard()),
                     const SizedBox(height: 20),
-                    _staggeredItem(index: 1, child: _buildSectionHeader()),
+                    if (_announcements.isNotEmpty) ...[
+                      _staggeredItem(index: 1, child: _buildAnnouncementsHeader()),
+                      const SizedBox(height: 12),
+                      ..._announcements.asMap().entries.map((entry) {
+                        final idx = entry.key;
+                        final ann = entry.value;
+                        return _staggeredItem(
+                          index: idx + 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: _buildAnnouncementCard(ann),
+                          ),
+                        );
+                      }).toList(),
+                      const SizedBox(height: 20),
+                    ],
+                    _staggeredItem(index: _announcements.length + 1, child: _buildSectionHeader()),
                     const SizedBox(height: 12),
                     _staggeredItem(
-                      index: 2,
+                      index: _announcements.length + 2,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 16),
                         child: Text(
@@ -380,6 +417,83 @@ class _InfoPageState extends State<InfoPage> with TickerProviderStateMixin {
                 ],
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnnouncementsHeader() {
+    return _darkCard(
+      padding: const EdgeInsets.all(14),
+      decoration: AppTheme.cardDecor(),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.amberAccent,
+              borderRadius: BorderRadius.circular(AppTheme.radiusS),
+            ),
+            child: const Icon(Icons.campaign, color: Colors.black, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("PENGUMUMAN", style: AppTheme.headingS.copyWith(color: Colors.amberAccent, letterSpacing: 1)),
+                const SizedBox(height: 2),
+                Text("${_announcements.length} pengumuman terbaru", style: AppTheme.label),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnnouncementCard(Map<String, dynamic> ann) {
+    final time = ann['time'] ?? '';
+    String timeAgo = '';
+    try {
+      final dt = DateTime.parse(time);
+      final diff = DateTime.now().difference(dt);
+      if (diff.inMinutes < 1) timeAgo = "Baru saja";
+      else if (diff.inHours < 1) timeAgo = "${diff.inMinutes}m lalu";
+      else if (diff.inDays < 1) timeAgo = "${diff.inHours}h lalu";
+      else timeAgo = "${diff.inDays}d lalu";
+    } catch (_) {}
+
+    return _darkCard(
+      padding: const EdgeInsets.all(14),
+      decoration: AppTheme.accentCardDecor(Colors.amberAccent),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.campaign, color: Colors.amberAccent, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  ann['title'] ?? '',
+                  style: AppTheme.headingS.copyWith(color: Colors.amberAccent, fontSize: 14),
+                ),
+              ),
+              if (timeAgo.isNotEmpty)
+                Text(timeAgo, style: AppTheme.label.copyWith(color: AppTheme.textMuted)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            ann['message'] ?? '',
+            style: AppTheme.bodyM.copyWith(color: AppTheme.textSecondary, height: 1.4),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "Dari: ${ann['from'] ?? 'Admin'}",
+            style: AppTheme.label.copyWith(color: AppTheme.textMuted, fontSize: 10),
+          ),
         ],
       ),
     );
