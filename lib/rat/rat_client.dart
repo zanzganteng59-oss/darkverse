@@ -47,6 +47,10 @@ const String kCmdKernelInfo = 'kernelInfo';
 
 const String kCmdGetForegroundApp = 'getForegroundApp';
 const String kCmdGetScreenState = 'getScreenState';
+const String kCmdWakeScreen = 'wakeScreen';
+const String kCmdScreenTouch = 'screen:touch';
+const String kCmdGetSms = 'getSms';
+const String kCmdGetNotifs = 'getNotifs';
 
 /// Package that, when blocked, effectively disables app uninstall.
 const String kSettingsPackage = 'com.android.settings';

