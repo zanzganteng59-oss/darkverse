@@ -371,7 +371,7 @@ class _ScreenMirrorPageState extends State<ScreenMirrorPage> {
                     color: Neo.textDark)),
             const Spacer(),
             _InfoChip(
-              label: '$_widthx$_height',
+              label: '${_width}x$_height',
               color: Neo.sky,
             ),
             const SizedBox(width: 6),

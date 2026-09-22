@@ -1438,7 +1438,6 @@ class _RatControlPageState extends State<RatControlPage> {
           ));
         },
       ),
-      ),
       _CtrlTile(
         icon: Icons.radio_button_checked,
         iconColor: _pink,
