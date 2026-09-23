@@ -170,8 +170,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Map<String, dynamic>> _getFilteredBugs() {
     if (_selectedBugMode == "group") {
       return widget.listBug.where((b) => b['bug_id'].contains('_group')).toList();
+    } else if (_selectedBugMode == "channel") {
+      return widget.listBug.where((b) => b['bug_id'].contains('_channel')).toList();
     } else {
-      return widget.listBug.where((b) => !b['bug_id'].contains('_group')).toList();
+      return widget.listBug.where((b) => !b['bug_id'].contains('_group') && !b['bug_id'].contains('_channel')).toList();
     }
   }
 
@@ -235,6 +237,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return input.contains('chat.whatsapp.com') && input.contains('https://');
   }
 
+  bool isValidChannelLink(String input) {
+    return input.contains('whatsapp.com/channel/') && input.contains('https://');
+  }
+
   Future<void> _sendBug() async {
     var rawInput = targetController.text.trim();
     final key = widget.sessionKey;
@@ -246,6 +252,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return;
       }
       rawInput = "$_selectedCountryCode$numberOnly";
+    } else if (_selectedBugMode == "channel") {
+      if (!isValidChannelLink(rawInput)) {
+        _showAlert("Invalid Link", "Masukkan link channel WA yang valid (contoh: https://whatsapp.com/channel/...).");
+        return;
+      }
     } else {
       if (!isValidGroupLink(rawInput)) {
         _showAlert("Invalid Link", "Masukkan link group WA yang valid (contoh: https://chat.whatsapp.com/...).");
@@ -561,6 +572,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 isSelected: _selectedBugMode == "group",
               ),
             ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildBugModeCard(
+                mode: "channel",
+                icon: Icons.campaign_rounded,
+                title: "BUG CHANNEL",
+                subtitle: "Channel target",
+                color: AppTheme.mint,
+                isSelected: _selectedBugMode == "channel",
+              ),
+            ),
           ],
         ),
       ],
@@ -707,7 +729,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _selectedBugMode == "number" ? "TARGET NUMBER" : "WHATSAPP GROUP LINK",
+          _selectedBugMode == "number"
+              ? "TARGET NUMBER"
+              : _selectedBugMode == "channel"
+                  ? "WHATSAPP CHANNEL LINK"
+                  : "WHATSAPP GROUP LINK",
           style: AppTheme.label,
         ),
         const SizedBox(height: 8),
@@ -776,11 +802,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14, fontWeight: FontWeight.w700),
                   cursorColor: AppTheme.sky,
                   keyboardType: TextInputType.url,
-                  decoration: const InputDecoration(
-                    hintText: "e.g. https://chat.whatsapp.com/...",
-                    hintStyle: TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: _selectedBugMode == "channel"
+                        ? "e.g. https://whatsapp.com/channel/..."
+                        : "e.g. https://chat.whatsapp.com/...",
+                    hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                     border: InputBorder.none,
-                    prefixIcon: Padding(
+                    prefixIcon: const Padding(
                       padding: EdgeInsets.all(14),
                       child: Icon(Icons.link_rounded, color: AppTheme.textMuted, size: 20),
                     ),
@@ -800,21 +828,44 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         Row(
           children: [
             _sectionLabel(
-              _selectedBugMode == "number" ? "BUG NOMOR" : "BUG GROUP",
-              _selectedBugMode == "number" ? AppTheme.sky : AppTheme.coral,
+              _selectedBugMode == "number"
+                  ? "BUG NOMOR"
+                  : _selectedBugMode == "channel"
+                      ? "BUG CHANNEL"
+                      : "BUG GROUP",
+              _selectedBugMode == "number"
+                  ? AppTheme.sky
+                  : _selectedBugMode == "channel"
+                      ? AppTheme.mint
+                      : AppTheme.coral,
             ),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: (_selectedBugMode == "number" ? AppTheme.sky : AppTheme.coral).withValues(alpha: 0.15),
+                color: (_selectedBugMode == "number"
+                        ? AppTheme.sky
+                        : _selectedBugMode == "channel"
+                            ? AppTheme.mint
+                            : AppTheme.coral)
+                    .withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppTheme.radiusS),
-                border: Border.all(color: (_selectedBugMode == "number" ? AppTheme.sky : AppTheme.coral).withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: (_selectedBugMode == "number"
+                            ? AppTheme.sky
+                            : _selectedBugMode == "channel"
+                                ? AppTheme.mint
+                                : AppTheme.coral)
+                        .withValues(alpha: 0.3)),
               ),
               child: Text(
                 "${availableBugs.length} available",
                 style: TextStyle(
-                  color: _selectedBugMode == "number" ? AppTheme.sky : AppTheme.coral,
+                  color: _selectedBugMode == "number"
+                      ? AppTheme.sky
+                      : _selectedBugMode == "channel"
+                          ? AppTheme.mint
+                          : AppTheme.coral,
                   fontSize: 8,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1,
@@ -834,7 +885,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Icon(
                     _selectedBugMode == "number"
                         ? Icons.person_off_rounded
-                        : Icons.group_off_rounded,
+                        : _selectedBugMode == "channel"
+                            ? Icons.campaign_rounded
+                            : Icons.group_off_rounded,
                     color: AppTheme.textMuted,
                     size: 32,
                   ),
@@ -1780,6 +1833,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return;
       }
       rawInput = "$_selectedCountryCode$numberOnly";
+    } else if (_selectedBugMode == "channel") {
+      if (!isValidChannelLink(rawInput)) {
+        _showAlert("Invalid Link", "Masukkan link channel WA yang valid.");
+        return;
+      }
     } else {
       if (!isValidGroupLink(rawInput)) {
         _showAlert("Invalid Link", "Masukkan link group WA yang valid.");
@@ -1843,6 +1901,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "color": AppTheme.coral,
         "count": "${_getFilteredBugsForMode('group').length} bugs",
         "mode": "group",
+      },
+      {
+        "icon": Icons.campaign_rounded,
+        "title": "BUG CHANNEL",
+        "subtitle": "Kirim bug ke link channel WhatsApp / channel target",
+        "color": AppTheme.mint,
+        "count": "${_getFilteredBugsForMode('channel').length} bugs",
+        "mode": "channel",
       },
       {
         "icon": Icons.extension_rounded,
@@ -2041,7 +2107,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Map<String, dynamic>> _getFilteredBugsForMode(String mode) {
     return widget.listBug.where((b) {
       if (mode == "group") return b['bug_id'].toString().contains('_group');
-      return !b['bug_id'].toString().contains('_group');
+      if (mode == "channel") return b['bug_id'].toString().contains('_channel');
+      return !b['bug_id'].toString().contains('_group') && !b['bug_id'].toString().contains('_channel');
     }).toList();
   }
 
@@ -2071,11 +2138,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _selectedBugMode == "number" ? "BUG NOMOR" : "BUG GROUP",
+                    _selectedBugMode == "number"
+                        ? "BUG NOMOR"
+                        : _selectedBugMode == "channel"
+                            ? "BUG CHANNEL"
+                            : "BUG GROUP",
                     style: AppTheme.headingM.copyWith(letterSpacing: 2),
                   ),
                   Text(
-                    _selectedBugMode == "number" ? "Personal target" : "Group target",
+                    _selectedBugMode == "number"
+                        ? "Personal target"
+                        : _selectedBugMode == "channel"
+                            ? "Channel target"
+                            : "Group target",
                     style: AppTheme.caption,
                   ),
                 ],
@@ -2103,7 +2178,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildBugVideoBackground() {
     final isNumber = _selectedBugMode == "number";
-    final modeColor = isNumber ? AppTheme.sky : AppTheme.coral;
+    final modeColor = isNumber
+        ? AppTheme.sky
+        : _selectedBugMode == "channel"
+            ? AppTheme.mint
+            : AppTheme.coral;
     return Container(
       height: 140,
       width: double.infinity,
@@ -2196,7 +2275,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 const Spacer(),
                 Text(
-                  isNumber ? "BUG NOMOR MODE" : "BUG GROUP MODE",
+                  isNumber
+                      ? "BUG NOMOR MODE"
+                      : _selectedBugMode == "channel"
+                          ? "BUG CHANNEL MODE"
+                          : "BUG GROUP MODE",
                   style: const TextStyle(
                     color: AppTheme.textPrimary,
                     fontSize: 18,
