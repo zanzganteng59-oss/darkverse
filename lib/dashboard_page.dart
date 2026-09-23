@@ -2000,12 +2000,31 @@ class _DashboardPageState extends State<DashboardPage>
     ];
 
     return Container(
-      height: 68,
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 28),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: _cardBg,
-        border: Border.all(color: _borderColor, width: 3),
-        boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(4, 4), blurRadius: 0)],
+        color: _isDarkMode
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.08),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: _isDarkMode ? 0.3 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: _isDarkMode ? 0.1 : 0.03),
+            blurRadius: 48,
+            offset: const Offset(0, 16),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2015,14 +2034,48 @@ class _DashboardPageState extends State<DashboardPage>
           return GestureDetector(
             onTap: () => _onBottomNavTapped(i),
             behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              width: 56,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutCubic,
+              width: active ? 64 : 52,
+              height: active ? 64 : 52,
+              decoration: BoxDecoration(
+                color: active
+                    ? (_isDarkMode
+                        ? _nbYellow.withValues(alpha: 0.15)
+                        : _nbYellow.withValues(alpha: 0.12))
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(active ? 22 : 18),
+                boxShadow: active
+                    ? [
+                        BoxShadow(
+                          color: _nbYellow.withValues(alpha: 0.2),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : [],
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(d.icon, size: 20, color: active ? _nbYellow : _textTertiary),
-                  const SizedBox(height: 4),
-                  Text(d.label, style: TextStyle(fontSize: 10, fontWeight: active ? FontWeight.w900 : FontWeight.w500, color: active ? _nbYellow : _textTertiary, fontFamily: 'Inter')),
+                  Icon(
+                    d.icon,
+                    size: active ? 22 : 20,
+                    color: active ? _nbYellow : _textTertiary,
+                  ),
+                  if (!active) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      d.label,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: _textTertiary,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -2097,13 +2150,20 @@ class _DashboardPageState extends State<DashboardPage>
         : role.toLowerCase() == 'admin' ? _nbOrange : _nbBlue;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _cardBg,
-        border: Border.all(color: _borderColor, width: 3),
+        color: _isDarkMode
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+          width: 1,
+        ),
         boxShadow: [
-          BoxShadow(color: _borderColor, offset: const Offset(5, 5), blurRadius: 0),
-          BoxShadow(color: _nbYellow.withValues(alpha: 0.15), offset: const Offset(2, 2), blurRadius: 10),
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.2 : 0.04), blurRadius: 24, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -2114,12 +2174,13 @@ class _DashboardPageState extends State<DashboardPage>
             child: Stack(
               children: [
                 Container(
-                  width: 72, height: 72,
+                  width: 76, height: 76,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: _nbYellow, width: 3),
-                    boxShadow: [BoxShadow(color: _nbYellow.withValues(alpha: 0.3), offset: const Offset(0, 3), blurRadius: 10)],
+                    gradient: LinearGradient(colors: [_nbYellow, _nbGreen]),
+                    boxShadow: [BoxShadow(color: _nbYellow.withValues(alpha: 0.25), blurRadius: 20, offset: const Offset(0, 6))],
                   ),
+                  padding: const EdgeInsets.all(3),
                   child: ClipOval(
                     child: _profileImage != null
                         ? Image.file(_profileImage!, fit: BoxFit.cover)
@@ -2131,11 +2192,12 @@ class _DashboardPageState extends State<DashboardPage>
                 Positioned(
                   bottom: 0, right: 0,
                   child: Container(
-                    width: 24, height: 24,
+                    width: 26, height: 26,
                     decoration: BoxDecoration(
                       color: _nbYellow,
                       shape: BoxShape.circle,
-                      border: Border.all(color: _nbBlack, width: 2),
+                      border: Border.all(color: _isDarkMode ? _nbBlack : Colors.white, width: 2.5),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 6)],
                     ),
                     child: Icon(Icons.camera_alt_rounded, color: _nbBlack, size: 12),
                   ),
@@ -2143,33 +2205,52 @@ class _DashboardPageState extends State<DashboardPage>
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           // Username
           GestureDetector(
             onTap: _showChangeUsernameDialog,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(username, style: TextStyle(color: _textPrimary, fontSize: 18, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+                Text(username, style: TextStyle(color: _textPrimary, fontSize: 20, fontWeight: FontWeight.w800, fontFamily: 'Inter', letterSpacing: -0.5)),
                 const SizedBox(width: 6),
                 Icon(Icons.edit_rounded, color: _nbYellow.withValues(alpha: 0.6), size: 14),
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           // Role + Active badges
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: roleColor, border: Border.all(color: _borderColor, width: 2)),
-                child: Text(role.toUpperCase(), style: TextStyle(color: _nbWhite, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: roleColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: roleColor.withValues(alpha: 0.3), width: 1),
+                ),
+                child: Text(role.toUpperCase(), style: TextStyle(color: roleColor, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: _nbGreen, border: Border.all(color: _borderColor, width: 2)),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: _nbGreen.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: _nbGreen.withValues(alpha: 0.3), width: 1),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(width: 6, height: 6, decoration: BoxDecoration(color: _nbGreen, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _nbGreen.withValues(alpha: 0.5), blurRadius: 4)])),
+                    const SizedBox(width: 5),
+                    Text("ACTIVE", style: TextStyle(color: _nbGreen, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
+                  ],
+                ),
+              ),
+            ],
+          ),
                 child: Text("ACTIVE", style: TextStyle(color: _nbBlack, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5, fontFamily: 'Inter')),
               ),
               const SizedBox(width: 8),
@@ -2221,8 +2302,9 @@ class _DashboardPageState extends State<DashboardPage>
       builder: (ctx, _) {
         return Container(
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
             boxShadow: [
-              BoxShadow(color: color.withValues(alpha: 0.15 + _glowAnim.value * 0.15), blurRadius: radius + _glowAnim.value * 6, spreadRadius: _glowAnim.value * 2),
+              BoxShadow(color: color.withValues(alpha: 0.08 + _glowAnim.value * 0.08), blurRadius: radius + _glowAnim.value * 8, spreadRadius: _glowAnim.value),
             ],
           ),
           child: child,
@@ -2240,12 +2322,18 @@ class _DashboardPageState extends State<DashboardPage>
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: _cardBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _borderColor, width: 3),
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _isDarkMode
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
+            width: 1,
+          ),
           boxShadow: [
-            BoxShadow(color: _borderColor, offset: const Offset(4, 4), blurRadius: 0),
-            BoxShadow(color: _nbGreen.withValues(alpha: 0.1), offset: const Offset(2, 2), blurRadius: 8),
+            BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
           ],
         ),
         child: Row(
@@ -2257,8 +2345,10 @@ class _DashboardPageState extends State<DashboardPage>
                   width: 48, height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: _nbGreen, width: 2.5),
+                    gradient: LinearGradient(colors: [_nbGreen, _nbCyan]),
+                    boxShadow: [BoxShadow(color: _nbGreen.withValues(alpha: 0.2), blurRadius: 10)],
                   ),
+                  padding: const EdgeInsets.all(2),
                   child: ClipOval(
                     child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover,
                       errorBuilder: (ctx, e, s) => Container(color: _nbGreen, child: Icon(Icons.person_rounded, color: _nbBlack, size: 24)),
@@ -2272,9 +2362,9 @@ class _DashboardPageState extends State<DashboardPage>
                     decoration: BoxDecoration(
                       color: _nbGreen,
                       shape: BoxShape.circle,
-                      border: Border.all(color: _cardBg, width: 2),
+                      border: Border.all(color: _isDarkMode ? _nbBlack : Colors.white, width: 2),
                     ),
-                    child: const Icon(Icons.add_rounded, color: Colors.black, size: 12),
+                    child: const Icon(Icons.add_rounded, color: Colors.white, size: 12),
                   ),
                 ),
               ],
@@ -2284,7 +2374,7 @@ class _DashboardPageState extends State<DashboardPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("STATUS", style: TextStyle(color: _textPrimary, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+                  Text("STATUS", style: TextStyle(color: _textPrimary, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.5, fontFamily: 'Inter')),
                   const SizedBox(height: 2),
                   Text("Post status kamu sekarang", style: TextStyle(color: _textTertiary, fontSize: 11, fontFamily: 'Inter')),
                 ],
@@ -2293,11 +2383,11 @@ class _DashboardPageState extends State<DashboardPage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _nbGreen,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _borderColor, width: 2),
+                color: _nbGreen.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _nbGreen.withValues(alpha: 0.3), width: 1),
               ),
-              child: const Text("POST", style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+              child: Text("POST", style: TextStyle(color: _nbGreen, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
             ),
           ],
         ),
@@ -2329,23 +2419,35 @@ class _DashboardPageState extends State<DashboardPage>
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: _borderColor, width: 3),
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: color.withValues(alpha: 0.25),
+            width: 1,
+          ),
           boxShadow: [
-            BoxShadow(color: _borderColor, offset: const Offset(4, 4), blurRadius: 0),
-            BoxShadow(color: color.withValues(alpha: 0.25), offset: const Offset(2, 2), blurRadius: 8),
+            BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 4)),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: _nbWhite, size: 16),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 14),
+            ),
             const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(label, style: TextStyle(color: _nbWhite.withValues(alpha: 0.7), fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 1, fontFamily: 'Inter')),
+                Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5, fontFamily: 'Inter')),
                 Text("@$handle", style: TextStyle(color: _nbWhite, fontSize: 11, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
               ],
             ),
@@ -2358,24 +2460,41 @@ class _DashboardPageState extends State<DashboardPage>
   // ════════ STAT CARDS ════════
   Widget _buildStatCard(String label, String value, IconData icon, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: bgColor,
-        border: Border.all(color: _borderColor, width: 3),
-        boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(5, 5), blurRadius: 0)],
+        color: _isDarkMode
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: _nbBlack, size: 18),
-              const SizedBox(width: 6),
-              Text(label, style: TextStyle(color: _nbBlack, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: bgColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: bgColor, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Text(label, style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5, fontFamily: 'Inter')),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(value, style: TextStyle(color: _nbBlack, fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+          const SizedBox(height: 12),
+          Text(value, style: TextStyle(color: _textPrimary, fontSize: 30, fontWeight: FontWeight.w800, fontFamily: 'Inter', letterSpacing: -1)),
         ],
       ),
     );
@@ -2392,13 +2511,20 @@ class _DashboardPageState extends State<DashboardPage>
       builder: (ctx, _) {
         final baseActive = ping <= 0 ? 0 : (barCount - (ping / 12).clamp(0, barCount).toInt());
         return Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _cardBg,
-            border: Border.all(color: _borderColor, width: 3),
+            color: _isDarkMode
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.white.withValues(alpha: 0.7),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: _isDarkMode
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
+              width: 1,
+            ),
             boxShadow: [
-              BoxShadow(color: _borderColor, offset: const Offset(5, 5), blurRadius: 0),
-              BoxShadow(color: color.withValues(alpha: 0.15), offset: const Offset(2, 2), blurRadius: 8),
+              BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
             ],
           ),
           child: Column(
@@ -2407,18 +2533,25 @@ class _DashboardPageState extends State<DashboardPage>
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: color, border: Border.all(color: _borderColor, width: 2)),
-                    child: Icon(Icons.wifi_rounded, color: _nbBlack, size: 12),
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.wifi_rounded, color: color, size: 12),
                   ),
-                  const SizedBox(width: 8),
-                  Text("SIGNAL", style: TextStyle(color: _textPrimary, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+                  const SizedBox(width: 10),
+                  Text("SIGNAL", style: TextStyle(color: _textPrimary, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.5, fontFamily: 'Inter')),
                   const Spacer(),
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: color, border: Border.all(color: _borderColor, width: 2)),
-                    child: Text("${_signalLabel(ping)} • ${ping}ms", style: TextStyle(color: _nbBlack, fontSize: 9, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+                    ),
+                    child: Text("${_signalLabel(ping)} • ${ping}ms", style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800, fontFamily: 'Inter')),
                   ),
                 ],
               ),
@@ -2460,13 +2593,18 @@ class _DashboardPageState extends State<DashboardPage>
       builder: (ctx, val, _) {
         _displayPing = val;
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: color,
-            border: Border.all(color: _borderColor, width: 3),
+            color: _isDarkMode
+                ? Colors.white.withValues(alpha: 0.06)
+                : Colors.white.withValues(alpha: 0.7),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: color.withValues(alpha: 0.25),
+              width: 1,
+            ),
             boxShadow: [
-              BoxShadow(color: _borderColor, offset: const Offset(5, 5), blurRadius: 0),
-              BoxShadow(color: color.withValues(alpha: 0.3), offset: const Offset(2, 2), blurRadius: 12),
+              BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, 6)),
             ],
           ),
           child: Column(
@@ -2474,20 +2612,27 @@ class _DashboardPageState extends State<DashboardPage>
             children: [
               Row(
                 children: [
-                  Icon(Icons.speed_rounded, color: _nbBlack, size: 18),
-                  const SizedBox(width: 6),
-                  Text("PING", style: TextStyle(color: _nbBlack, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.speed_rounded, color: color, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Text("PING", style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5, fontFamily: 'Inter')),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("$val", style: TextStyle(color: _nbBlack, fontSize: 28, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+                  Text("$val", style: TextStyle(color: color, fontSize: 30, fontWeight: FontWeight.w800, fontFamily: 'Inter', letterSpacing: -1)),
                   const SizedBox(width: 4),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: Text("ms", style: TextStyle(color: _nbBlack, fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+                    child: Text("ms", style: TextStyle(color: _textSecondary, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Inter')),
                   ),
                 ],
               ),
@@ -2503,13 +2648,18 @@ class _DashboardPageState extends State<DashboardPage>
     return Container(
       height: 160,
       decoration: BoxDecoration(
-        border: Border.all(color: _borderColor, width: 3),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+          width: 1,
+        ),
         boxShadow: [
-          BoxShadow(color: _borderColor, offset: const Offset(6, 6), blurRadius: 0),
-          BoxShadow(color: _nbYellow.withValues(alpha: 0.1), offset: const Offset(3, 3), blurRadius: 12),
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.2 : 0.05), blurRadius: 20, offset: const Offset(0, 8)),
         ],
       ),
-      clipBehavior: Clip.hardEdge,
+      clipBehavior: Clip.antiAlias,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -2566,9 +2716,10 @@ class _DashboardPageState extends State<DashboardPage>
     final sc = shadowColor ?? _borderColor;
     return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: sc.withValues(alpha: 0.6), offset: Offset(depth, depth), blurRadius: 0),
-          BoxShadow(color: sc.withValues(alpha: 0.3), offset: Offset(depth * 1.5, depth * 1.5), blurRadius: depth),
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.25 : 0.06), blurRadius: 20, offset: Offset(0, depth)),
+          BoxShadow(color: sc.withValues(alpha: 0.08), blurRadius: depth * 3, offset: Offset(0, depth / 2)),
         ],
       ),
       child: child,
@@ -2580,18 +2731,35 @@ class _DashboardPageState extends State<DashboardPage>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: bgColor,
-          border: Border.all(color: _borderColor, width: 3),
-          boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(4, 4), blurRadius: 0)],
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: _isDarkMode
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.06),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: _nbBlack, size: 24),
-            const SizedBox(height: 12),
-            Text(label, style: TextStyle(color: _nbBlack, fontSize: 13, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: bgColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: bgColor, size: 22),
+            ),
+            const SizedBox(height: 14),
+            Text(label, style: TextStyle(color: _textPrimary, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Inter', letterSpacing: 0.5)),
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.centerRight,
@@ -2610,11 +2778,21 @@ class _DashboardPageState extends State<DashboardPage>
   // ════════ SYSTEM STATUS ════════
   Widget _buildSystemStatus() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: _cardBg,
-        border: Border.all(color: _borderColor, width: 3),
-        boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(5, 5), blurRadius: 0)],
+        color: _isDarkMode
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2622,28 +2800,35 @@ class _DashboardPageState extends State<DashboardPage>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: _nbBlack),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _nbGreen.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Icon(Icons.shield_rounded, color: _nbGreen, size: 14),
               ),
-              const SizedBox(width: 8),
-              Text("STATUS SISTEM", style: TextStyle(color: _textPrimary, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+              const SizedBox(width: 10),
+              Text("STATUS SISTEM", style: TextStyle(color: _textPrimary, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.5, fontFamily: 'Inter')),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: _nbGreen, border: Border.all(color: _borderColor, width: 2)),
-                child: Text("ACTIVE", style: TextStyle(color: _nbBlack, fontSize: 10, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: _nbGreen.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _nbGreen.withValues(alpha: 0.3), width: 1),
+                ),
+                child: Text("ACTIVE", style: TextStyle(color: _nbGreen, fontSize: 10, fontWeight: FontWeight.w800, fontFamily: 'Inter')),
               ),
             ],
           ),
           const SizedBox(height: 14),
           Row(
             children: [
-              _statusBox("SERVER", "ONLINE", _nbGreen),
+              Expanded(child: _statusBox("SERVER", "ONLINE", _nbGreen)),
               const SizedBox(width: 8),
-              _statusBox("API", "AKTIF", _nbCyan),
+              Expanded(child: _statusBox("API", "AKTIF", _nbCyan)),
               const SizedBox(width: 8),
-              _statusBox("SECURITY", "AMAN", _nbYellow),
+              Expanded(child: _statusBox("SECURITY", "AMAN", _nbYellow)),
             ],
           ),
         ],
@@ -2652,21 +2837,19 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Widget _statusBox(String label, String value, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: color,
-          border: Border.all(color: _borderColor, width: 2),
-          boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(3, 3), blurRadius: 0)],
-        ),
-        child: Column(
-          children: [
-            Text(label, style: TextStyle(color: _nbBlack, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5, fontFamily: 'Inter')),
-            const SizedBox(height: 4),
-            Text(value, style: TextStyle(color: _nbBlack, fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Inter')),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+      ),
+      child: Column(
+        children: [
+          Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.5, fontFamily: 'Inter')),
+          const SizedBox(height: 4),
+          Text(value, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'Inter')),
+        ],
       ),
     );
   }
@@ -2683,11 +2866,21 @@ class _DashboardPageState extends State<DashboardPage>
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: _cardBg,
-        border: Border.all(color: _borderColor, width: 3),
-        boxShadow: [BoxShadow(color: _nbRed.withValues(alpha: 0.3), offset: const Offset(4, 4), blurRadius: 0)],
+        color: _isDarkMode
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: _isDarkMode
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2695,17 +2888,24 @@ class _DashboardPageState extends State<DashboardPage>
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: _nbRed),
-                child: Icon(Icons.local_fire_department_rounded, color: _nbWhite, size: 14),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _nbRed.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.local_fire_department_rounded, color: _nbRed, size: 14),
               ),
-              const SizedBox(width: 8),
-              Text("HOT NEWS", style: TextStyle(color: _nbRed, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+              const SizedBox(width: 10),
+              Text("HOT NEWS", style: TextStyle(color: _nbRed, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.5, fontFamily: 'Inter')),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: _nbRed.withValues(alpha: 0.2), border: Border.all(color: _nbRed, width: 1)),
-                child: Text("TRENDING", style: TextStyle(color: _nbRed, fontSize: 8, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _nbRed.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _nbRed.withValues(alpha: 0.25), width: 1),
+                ),
+                child: Text("TRENDING", style: TextStyle(color: _nbRed, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.5, fontFamily: 'Inter')),
               ),
             ],
           ),
@@ -2720,11 +2920,18 @@ class _DashboardPageState extends State<DashboardPage>
                 final t = hotTopics[i];
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 2),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: _nbBlack,
-                    border: Border.all(color: _borderColor, width: 2),
-                    boxShadow: [BoxShadow(color: _borderColor, offset: const Offset(2, 2), blurRadius: 0)],
+                    color: _isDarkMode
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: _isDarkMode
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : Colors.black.withValues(alpha: 0.04),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -2778,7 +2985,7 @@ class _DashboardPageState extends State<DashboardPage>
     return Stack(
       children: [
         _buildVideoBackground(),
-        Container(color: _bgPrimary.withValues(alpha: 0.88)),
+        Container(color: _bgPrimary.withValues(alpha: 0.82)),
         SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -2790,41 +2997,67 @@ class _DashboardPageState extends State<DashboardPage>
                 // ══ TOP BAR (animated entry) ══
                 _slideIn(0, child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _breathingGlow(color: _nbYellow, radius: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: _nbBlack,
-                        border: Border.all(color: _borderColor, width: 3),
-                        boxShadow: [BoxShadow(color: _nbYellow, offset: const Offset(4, 4), blurRadius: 0)],
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: _isDarkMode
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : Colors.white.withValues(alpha: 0.65),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: _isDarkMode
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.06),
+                        width: 1,
                       ),
-                      child: Row(
-                        children: [
-                          AnimatedBuilder(animation: _glowAnim, builder: (ctx, _) => Icon(Icons.shield_rounded, color: _nbYellow, size: 22 + _glowAnim.value * 2)),
-                          const SizedBox(width: 10),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.2 : 0.04), blurRadius: 20, offset: const Offset(0, 6)),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        AnimatedBuilder(animation: _glowAnim, builder: (ctx, _) => Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _nbYellow.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.shield_rounded, color: _nbYellow, size: 20 + _glowAnim.value * 2),
+                        )),
+                        const SizedBox(width: 12),
                           Expanded(
                             child: _MegatronIntro(textColor: _nbYellow, glowColor: _nbYellow, fontSize: 20),
                           ),
-                          Text(dateStr, style: TextStyle(color: _nbYellow.withValues(alpha: 0.6), fontSize: 10, fontFamily: 'Inter')),
+                          Text(dateStr, style: TextStyle(color: _textSecondary, fontSize: 10, fontFamily: 'Inter')),
                           const SizedBox(width: 8),
                           const LiveClockWidget(),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: _toggleDarkMode,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: _nbYellow, borderRadius: BorderRadius.circular(10), border: Border.all(color: _nbWhite, width: 2)),
-                              child: Icon(_isDarkMode ? Icons.light_mode : Icons.dark_mode, color: _nbBlack, size: 18),
+                              decoration: BoxDecoration(
+                                color: _isDarkMode
+                                    ? Colors.white.withValues(alpha: 0.08)
+                                    : Colors.black.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Icon(_isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded, color: _nbYellow, size: 18),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           GestureDetector(
                             onTap: _showAccessDialog,
                             child: Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(color: _nbYellow, borderRadius: BorderRadius.circular(10), border: Border.all(color: _nbWhite, width: 2)),
-                              child: Icon(Icons.vpn_key_rounded, color: _nbBlack, size: 18),
+                              decoration: BoxDecoration(
+                                color: _isDarkMode
+                                    ? Colors.white.withValues(alpha: 0.08)
+                                    : Colors.black.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Icon(Icons.vpn_key_rounded, color: _nbYellow, size: 18),
                             ),
                           ),
                         ],
@@ -2907,28 +3140,42 @@ class _DashboardPageState extends State<DashboardPage>
                 // ══ NEWS TICKER ══
                 _slideIn(10, child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _nb3D(depth: 4, shadowColor: _nbYellow, child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: _nbYellow,
-                      border: Border.all(color: _borderColor, width: 3),
+                      color: _isDarkMode
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : Colors.white.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: _isDarkMode
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.06),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: _isDarkMode ? 0.15 : 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+                      ],
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(color: _nbBlack),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: _nbYellow.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           child: Icon(Icons.newspaper_rounded, color: _nbYellow, size: 14),
                         ),
                         const SizedBox(width: 10),
-                        Text("NEWS", style: TextStyle(color: _nbBlack, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1, fontFamily: 'Inter')),
+                        Text("NEWS", style: TextStyle(color: _nbYellow, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1, fontFamily: 'Inter')),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: _buildMarquee(text: "WELCOME TO MEGATRON  •  SYSTEM ONLINE  •  ALL SYSTEMS OPERATIONAL  •  STAY TUNED", style: TextStyle(color: _nbBlack, fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+                          child: _buildMarquee(text: "WELCOME TO MEGATRON  •  SYSTEM ONLINE  •  ALL SYSTEMS OPERATIONAL  •  STAY TUNED", style: TextStyle(color: _textSecondary, fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'Inter')),
                         ),
                       ],
                     ),
-                  )),
+                  ),
                 )),
 
                 const SizedBox(height: 20),
